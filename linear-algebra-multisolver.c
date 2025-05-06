@@ -65,112 +65,93 @@ int main(int argc, char *argv[])
 
     // --- Loop to process systems of equations ---
     printf("\nStarting to read systems from file...\n");
-    while (fscanf(fp, "%d %d", &n, &m_read) == 2) {
+    if(fscanf(fp, "%d %d", &n, &m_read) != 2) {}
 
-        // --- Validation and Header Consumption for A and b ---
-        // ... [This part remains the same: read N, M, headers before A, matrix A, headers before b, vector b] ...
-         if (n <= 0 || n > NP) { /* Validation */ break; }
-         if (m_read != 1) { /* Warning */ }
-         fgets(dummy, MAXSTR, fp); // Consume rest of N M line
-         fgets(dummy, MAXSTR, fp); // Consume header before A
+    // --- Validation and Header Consumption for A and b ---
+    // ... [This part remains the same: read N, M, headers before A, matrix A, headers before b, vector b] ...
+    if (n <= 0 || n > NP) { /* Validation */ }
+    if (m_read != 1) { /* Warning */ }
+    fgets(dummy, MAXSTR, fp); // Consume rest of N M line
+    fgets(dummy, MAXSTR, fp); // Consume header before A
 
-         printf("\n--- Processing System (N=%d) from %s ---\n", n, input_filename);
-         printf("Reading Matrix A (%d x %d):\n", n, n);
-         for (k = 1; k <= n; k++) { // Read A
-             for (l = 1; l <= n; l++) {
-                 if (fscanf(fp, "%f", &a[k][l]) != 1) { nrerror("Error reading matrix A");}
-                 a_chol[k][l] = a[k][l]; // COPY A
-             }
-         }
-         fgets(dummy, MAXSTR, fp); // Consume line after A
-         fgets(dummy, MAXSTR, fp); // Consume header before b
-
-         printf("Reading Vector b (%d x 1):\n", n);
-         for (k = 1; k <= n; k++) { // Read b
-              if (fscanf(fp, "%f", &b[k]) != 1) { nrerror("Error reading vector b");}
-              while (fgetc(fp) != '\n' && !feof(fp)); // Consume rest of line
-         }
-
-         print_nr_matrix(a, 1, n, 1, n, "Original A");
-         print_nr_vector(b, 1, n, "Original b");
-
-
-        // --- Solve using selected method ---
-        int solve_success = 1;
-        if (method == CHOLESKY) {
-            printf("\nAttempting Cholesky Decomposition...\n");
-            if (!is_symmetric(a, n)) {
-                fprintf(stderr, "ERROR: Matrix A is not symmetric. Cholesky method cannot be used.\n");
-                solve_success = 0; // Mark as failed
-            } else {
-                printf("Matrix is symmetric. Proceeding with Cholesky.\n");
-                // Use try-catch or setjmp/longjmp if nrerror doesn't exit
-                // For simplicity, assume nrerror exits if not positive-definite
-                cholesky(a_chol, n); // Modifies a_chol, might exit
-                printf("Cholesky decomposition successful.\n");
-                print_nr_matrix(a_chol, 1, n, 1, n, "Decomposed A (L factor)");
-                cholesky_solve(a_chol, b, x, n); // Solve using decomposed matrix
-                printf("Cholesky solve complete.\n");
-            }
-        } else { // GAUSS_JORDAN
-             // ... [Gauss-Jordan logic remains the same] ...
-             printf("\nAttempting Gauss-Jordan Elimination...\n");
-             for (k = 1; k <= n; k++) {
-                 for (l = 1; l <= n; l++) { Aug[k][l] = a[k][l]; }
-                 Aug[k][n + 1] = b[k];
-             }
-             print_nr_matrix(Aug, 1, n, 1, n + 1, "Initial Augmented [A|b]");
-             gauss_jordan_partial(Aug, n); // Modifies Aug, might exit
-             printf("Gauss-Jordan complete.\n");
-             print_nr_matrix(Aug, 1, n, 1, n + 1, "Final Augmented [I|x]");
-             for (k = 1; k <= n; k++) { x[k] = Aug[k][n + 1]; }
+    printf("\n--- Processing System (N=%d) from %s ---\n", n, input_filename);
+    printf("Reading Matrix A (%d x %d):\n", n, n);
+    for (k = 1; k <= n; k++) { // Read A
+        for (l = 1; l <= n; l++) {
+            if (fscanf(fp, "%f", &a[k][l]) != 1) { nrerror("Error reading matrix A");}
+            a_chol[k][l] = a[k][l]; // COPY A
         }
+    }
+    fgets(dummy, MAXSTR, fp); // Consume line after A
+    fgets(dummy, MAXSTR, fp); // Consume header before b
 
-        // --- Print and Verify Solution ---
-        if (solve_success) {
-            // ... [Verification logic remains the same] ...
-             print_nr_vector(x, 1, n, "Solution x");
-             printf("Verifying solution (Calculating A * x)...\n");
-             for (k = 1; k <= n; k++) {
-                 check[k] = 0.0;
-                 for (j = 1; j <= n; j++) { check[k] += a[k][j] * x[j]; }
-             }
-             print_nr_vector(check, 1, n, "Calculated A*x");
-             printf("Comparing A*x with original b:\n");
-             int errors = 0;
-             for (k = 1; k <= n; k++) {
-                  if (fabs(check[k] - b[k]) > TOL) {
-                      printf("  Mismatch at index [%d]: ...\n", k); errors++;
-                  }
-             }
-             if (errors == 0) { printf("  Verification successful...\n"); }
-             else { printf("  Verification FAILED...\n"); }
+    printf("Reading Vector b (%d x 1):\n", n);
+    for (k = 1; k <= n; k++) { // Read b
+        if (fscanf(fp, "%f", &b[k]) != 1) { nrerror("Error reading vector b");}
+    }
 
+    print_nr_matrix(a, 1, n, 1, n, "Original A");
+    print_nr_vector(b, 1, n, "Original b");
+
+
+    // --- Solve using selected method ---
+    int solve_success = 1;
+    if (method == CHOLESKY) {
+        printf("\nAttempting Cholesky Decomposition...\n");
+        if (!is_symmetric(a, n)) {
+            fprintf(stderr, "ERROR: Matrix A is not symmetric. Cholesky method cannot be used.\n");
+            solve_success = 0; // Mark as failed
         } else {
-             printf("\nSkipping verification for this system due to solver incompatibility or failure.\n");
+            printf("Matrix is symmetric. Proceeding with Cholesky.\n");
+            // Use try-catch or setjmp/longjmp if nrerror doesn't exit
+            // For simplicity, assume nrerror exits if not positive-definite
+            cholesky(a_chol, n); // Modifies a_chol, might exit
+            printf("Cholesky decomposition successful.\n");
+            print_nr_matrix(a_chol, 1, n, 1, n, "Decomposed A (L factor)");
+            cholesky_solve(a_chol, b, x, n); // Solve using decomposed matrix
+            printf("Cholesky solve complete.\n");
         }
-        printf("\n------------------------------------\n\n"); // Separator
-
-
-        // *** ADDED FIX ***
-        // Consume the expected separator/header lines BETWEEN systems
-        // before the next fscanf in the while condition tries to read N M.
-        // Adjust the number of lines based on the expected file format.
-        // Assuming 3 lines based on the example file format: blank, description, "---"
-        int headers_to_skip = 3;
-        for(int skip_count = 0; skip_count < headers_to_skip; ++skip_count) {
-            // Read and discard the line. Check for EOF.
-            if (fgets(dummy, MAXSTR, fp) == NULL) {
-                // Reached EOF or read error, break out of the outer while loop
-                goto end_file_processing; // Use goto to exit outer loop cleanly
+    } else { // GAUSS_JORDAN
+            // ... [Gauss-Jordan logic remains the same] ...
+            printf("\nAttempting Gauss-Jordan Elimination...\n");
+            for (k = 1; k <= n; k++) {
+                for (l = 1; l <= n; l++) { Aug[k][l] = a[k][l]; }
+                Aug[k][n + 1] = b[k];
             }
-        }
-        // Now the file pointer should be positioned just before the next N M line
-        // or at EOF if the last system was just processed.
+            print_nr_matrix(Aug, 1, n, 1, n + 1, "Initial Augmented [A|b]");
+            gauss_jordan_partial(Aug, n); // Modifies Aug, might exit
+            printf("Gauss-Jordan complete.\n");
+            print_nr_matrix(Aug, 1, n, 1, n + 1, "Final Augmented [I|x]");
+            for (k = 1; k <= n; k++) { x[k] = Aug[k][n + 1]; }
+    }
 
-    } // End while loop reading file
+    // --- Print and Verify Solution ---
+    if (solve_success) {
+        // ... [Verification logic remains the same] ...
+            print_nr_vector(x, 1, n, "Solution x");
+            printf("Verifying solution (Calculating A * x)...\n");
+            for (k = 1; k <= n; k++) {
+                check[k] = 0.0;
+                for (j = 1; j <= n; j++) { check[k] += a[k][j] * x[j]; }
+            }
+            print_nr_vector(check, 1, n, "Calculated A*x");
+            printf("Comparing A*x with original b:\n");
+            int errors = 0;
+            for (k = 1; k <= n; k++) {
+                if (fabs(check[k] - b[k]) > TOL) {
+                    printf("  Mismatch at index [%d]: ...\n", k); errors++;
+                }
+            }
+            if (errors == 0) { printf("  Verification successful...\n"); }
+            else { printf("  Verification FAILED...\n"); }
 
-end_file_processing:; // Label for goto jump destination
+    } else {
+            printf("\nSkipping verification for this system due to solver incompatibility or failure.\n");
+    }
+    printf("\n------------------------------------\n\n"); // Separator
+
+
+
 
     if (!feof(fp)) {
         fprintf(stderr, "Warning: File processing stopped before reaching end-of-file. Check file format near last processed system.\n");

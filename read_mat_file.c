@@ -67,7 +67,7 @@ int main(int argc, char *argv[]){
     float **A = (float **)malloc((size_t)n * sizeof(float *));
     float *A_data = (float *)malloc((size_t)n * n * sizeof(float));
     for (int i = 0; i < n; i++){
-        A[i] = A_data + (size_t) i * n;
+        A[i] = A_data + (size_t) i * n; //link the data to the matrix
     }
 
     for (int i = 0; i <n; i++){

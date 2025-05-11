@@ -45,12 +45,12 @@ int main(int argc, char *argv[])
 
 
     // --- Allocate Matrices/Vectors (remains the same) ---
-    a = matrix(1, NP, 1, NP);
-    b = vector(1, NP);
-    x = vector(1, NP);
-    Aug = matrix(1, NP, 1, NP + 1);
-    a_chol = matrix(1, NP, 1, NP);
-    check = vector(1, NP);
+    a = matrix(NP,  NP);
+    b = vector(NP);
+    x = vector(NP);
+    Aug = matrix(NP, NP + 1);
+    a_chol = matrix(NP, NP);
+    check = vector(NP);
 
     // --- Open the specified input file (remains the same) ---
     printf("Input file: %s\n", input_filename);
@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
 
     printf("\n--- Processing System (N=%d) from %s ---\n", n, input_filename);
     printf("Reading Matrix A (%d x %d):\n", n, n);
-    for (k = 1; k <= n; k++) { // Read A
-        for (l = 1; l <= n; l++) {
+    for (k = 0; k < n; k++) { // Read A
+        for (l = 0; l < n; l++) {
             if (fscanf(fp, "%f", &a[k][l]) != 1) { nrerror("Error reading matrix A");}
             a_chol[k][l] = a[k][l]; // COPY A
         }
@@ -86,12 +86,12 @@ int main(int argc, char *argv[])
     fgets(dummy, MAXSTR, fp); // Consume header before b
 
     printf("Reading Vector b (%d x 1):\n", n);
-    for (k = 1; k <= n; k++) { // Read b
+    for (k = 0; k < n; k++) { // Read b
         if (fscanf(fp, "%f", &b[k]) != 1) { nrerror("Error reading vector b");}
     }
 
-    print_nr_matrix(a, 1, n, 1, n, "Original A");
-    print_nr_vector(b, 1, n, "Original b");
+    print_matrix(a, n,  n, "Original A");
+    print_vector(b,  n, "Original b");
 
 
     // --- Solve using selected method ---
@@ -107,37 +107,37 @@ int main(int argc, char *argv[])
             // For simplicity, assume nrerror exits if not positive-definite
             cholesky(a_chol, n); // Modifies a_chol, might exit
             printf("Cholesky decomposition successful.\n");
-            print_nr_matrix(a_chol, 1, n, 1, n, "Decomposed A (L factor)");
+            print_matrix(a_chol, n, n, "Decomposed A (L factor)");
             cholesky_solve(a_chol, b, x, n); // Solve using decomposed matrix
             printf("Cholesky solve complete.\n");
         }
     } else { // GAUSS_JORDAN
             // ... [Gauss-Jordan logic remains the same] ...
             printf("\nAttempting Gauss-Jordan Elimination...\n");
-            for (k = 1; k <= n; k++) {
-                for (l = 1; l <= n; l++) { Aug[k][l] = a[k][l]; }
-                Aug[k][n + 1] = b[k];
+            for (k = 0; k < n; k++) {
+                for (l = 0; l < n; l++) { Aug[k][l] = a[k][l]; }
+                Aug[k][n ] = b[k];
             }
-            print_nr_matrix(Aug, 1, n, 1, n + 1, "Initial Augmented [A|b]");
+            print_matrix(Aug, n, n + 1, "Initial Augmented [A|b]");
             gauss_jordan_partial(Aug, n); // Modifies Aug, might exit
             printf("Gauss-Jordan complete.\n");
-            print_nr_matrix(Aug, 1, n, 1, n + 1, "Final Augmented [I|x]");
-            for (k = 1; k <= n; k++) { x[k] = Aug[k][n + 1]; }
+            print_matrix(Aug, n, n + 1, "Final Augmented [I|x]");
+            for (k = 0; k < n; k++) { x[k] = Aug[k][n ]; }
     }
 
     // --- Print and Verify Solution ---
     if (solve_success) {
         // ... [Verification logic remains the same] ...
-            print_nr_vector(x, 1, n, "Solution x");
+            print_vector(x,  n, "Solution x");
             printf("Verifying solution (Calculating A * x)...\n");
-            for (k = 1; k <= n; k++) {
+            for (k = 0; k < n; k++) {
                 check[k] = 0.0;
-                for (j = 1; j <= n; j++) { check[k] += a[k][j] * x[j]; }
+                for (j = 0; j < n; j++) { check[k] += a[k][j] * x[j]; }
             }
-            print_nr_vector(check, 1, n, "Calculated A*x");
+            print_vector(check, n, "Calculated A*x");
             printf("Comparing A*x with original b:\n");
             int errors = 0;
-            for (k = 1; k <= n; k++) {
+            for (k = 0; k < n; k++) {
                 if (fabs(check[k] - b[k]) > TOL) {
                     printf("  Mismatch at index [%d]: ...\n", k); errors++;
                 }
@@ -163,12 +163,12 @@ int main(int argc, char *argv[])
 
     // --- Free Memory ---
     printf("Freeing memory...\n");
-    free_matrix(a, 1, 1);
-    free_vector(b, 1, NP);
-    free_vector(x, 1, NP);
-    free_matrix(Aug, 1, 1);
-    free_matrix(a_chol, 1, 1);
-    free_vector(check, 1, NP);
+    free_matrix(a);
+    free_vector(b);
+    free_vector(x);
+    free_matrix(Aug);
+    free_matrix(a_chol);
+    free_vector(check);
 
     printf("Done.\n");
     return 0;

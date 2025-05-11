@@ -15,11 +15,11 @@ void nrerror(char error_text[])
 }
 
 
-void print_nr_matrix(float **mat, long nrl, long nrh, long ncl, long nch, const char *name) {
-    printf("%s [%ld..%ld][%ld..%ld]:\n", name, nrl, nrh, ncl, nch);
-    for (long i = nrl; i <= nrh; i++) {
+void print_matrix(float **mat, long length_row, long length_col, const char *name) {
+    printf("%s [%ld..%ld]:\n", name, length_row, length_col);
+    for (long i = 0; i < length_row; i++) {
         printf("  [ ");
-        for (long j = ncl; j <= nch; j++) {
+        for (long j = 0; j < length_col; j++) {
             float val = mat[i][j];
             if (fabs(val) < 1e-12) val = 0.0; // Prevent printing -0.0000
             printf("%10.4f ", val);
@@ -30,10 +30,10 @@ void print_nr_matrix(float **mat, long nrl, long nrh, long ncl, long nch, const 
 }
 
 
-void print_nr_vector(float *vec, long nl, long nh, const char *name) {
-    printf("%s [%ld..%ld]:\n", name, nl, nh);
+void print_vector(float *vec, long length, const char *name) {
+    printf("%s [%ld]:\n", name, length);
     printf("  [ ");
-    for (long i = nl; i <= nh; i++) {
+    for (long i = 0; i < length; i++) {
         float val = vec[i];
          if (fabs(val) < 1e-12) val = 0.0; // Prevent printing -0.0000
         printf("%10.4f ", val);
@@ -42,78 +42,69 @@ void print_nr_vector(float *vec, long nl, long nh, const char *name) {
 }
 
 
-float *fvector(long nl, long nh)
-{
+float *vector(long length) {
     float *v;
-    v = (float *) malloc((size_t) ((nh-nl+1+NR_END) * sizeof(float)));
+    v = (float *)malloc((size_t)(length * sizeof(float)));
     if (!v) nrerror("allocation failure in vector()");
-    return v-nl+NR_END;
+    return v ;
 }
 
-int *ivector(long nl, long nh)
+
+int *ivector(long length)
 {
     int *v;
 
-    v=(int*) malloc((size_t) ((nh-nl+1+NR_END) * sizeof(int)));
+    v = malloc((size_t) (length * sizeof(int)));
     if (!v) nrerror("allocation failure in ivector()");
-    return v-nl+NR_END;
+    return v;
+}
+
+double *dvector(long length) {
+    double *v;
+    v = (double *)malloc((size_t)(length * sizeof(double)));
+    if (!v) nrerror("allocation failure in dvector()");
+    return v ;
 }
 
 
-float *vector(long nl, long nh) {
-    float *v;
-    v = (float *)malloc((size_t)((nh - nl + 1 + NR_END) * sizeof(float)));
-    if (!v) nrerror("allocation failure in vector()");
-    return v - nl + NR_END;
-}
 
-float **matrix(long nrl, long nrh, long ncl, long nch) {
-    long i, nrow = nrh - nrl + 1, ncol = nch - ncl + 1;
+float **matrix(long length_rows, long length_cols) {
     float **m;
-
+    float *m_data;
     // Allocate pointers to rows
-    m = (float **)malloc((size_t)((nrow + NR_END) * sizeof(float *)));
+    m = malloc((size_t)(length_rows * sizeof(float *)));
     if (!m) nrerror("allocation failure 1 in matrix()");
-    m += NR_END;
-    m -= nrl;
+
+    m_data = malloc((size_t)(length_rows * length_cols * sizeof(float)));
+    if (!m_data) nrerror("allocation failure 2 in matrix()");
+
+   
 
     // Allocate rows and set pointers to them
-    m[nrl] = (float *)malloc((size_t)((nrow * ncol + NR_END) * sizeof(float)));
-    if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
-    m[nrl] += NR_END;
-    m[nrl] -= ncl;
-
-    for (i = nrl + 1; i <= nrh; i++) m[i] = m[i - 1] + ncol;
+    for (long i = 0; i < length_rows; i++) {
+        m[i] = m_data + (size_t)i * length_cols; //link the data to the matrix
+    }
 
     return m;
 }
 
 
-// --- Double Utils ---
-double *dvector(long nl, long nh) {
-    double *v;
-    v = (double *)malloc((size_t)((nh - nl + 1 + NR_END) * sizeof(double)));
-    if (!v) nrerror("allocation failure in dvector()");
-    return v - nl + NR_END;
-}
 
-double **dmatrix(long nrl, long nrh, long ncl, long nch) {
-    long i, nrow = nrh - nrl + 1, ncol = nch - ncl + 1;
+
+double **dmatrix(long length_rows, long length_cols) {
     double **m;
+    double *m_data;
 
     // Allocate pointers to rows
-    m = (double **)malloc((size_t)((nrow + NR_END) * sizeof(double *)));
+    m = (double **)malloc((size_t)( length_rows * sizeof(double *)));
     if (!m) nrerror("allocation failure 1 in matrix()");
-    m += NR_END;
-    m -= nrl;
+    m_data = (double *)malloc((size_t)(length_rows * length_cols * sizeof(double)));
+    if (!m_data) nrerror("allocation failure 2 in matrix()");
 
     // Allocate rows and set pointers to them
-    m[nrl] = (double *)malloc((size_t)((nrow * ncol + NR_END) * sizeof(double)));
-    if (!m[nrl]) nrerror("allocation failure 2 in matrix()");
-    m[nrl] += NR_END;
-    m[nrl] -= ncl;
-
-    for (i = nrl + 1; i <= nrh; i++) m[i] = m[i - 1] + ncol;
+    for (long i = 0; i < length_rows; i++) {
+        m[i] = m_data + (size_t)i * length_cols; //link the data to the matrix
+    }
 
     return m;
 }
@@ -122,26 +113,29 @@ double **dmatrix(long nrl, long nrh, long ncl, long nch) {
 
 // --- Deallocation Functions  ---
 
-void free_vector(float *v, long nl) {
-    free((void *)(v + nl - NR_END));
+void free_vector(float *v) {
+    free(v);
 }
 
-void free_matrix(float **m, long nrl,  long ncl) {
-    free((void *)(m[nrl] + ncl - NR_END));
-    free((void *)(m + nrl - NR_END));
-}
-
-
-void free_dvector(double *v, long nl) {
-    free((void *)(v + nl - NR_END));
-}
-
-void free_dmatrix(double **m, long nrl, long ncl) {
-    free((void *)(m[nrl] + ncl - NR_END));
-    free((void *)(m + nrl - NR_END));
+void free_ivector(int *v) {
+    free(v);
 }
 
 
-void free_ivector(int *v, long nl) {
-     free((void*)(v + nl - NR_END));
+void free_dvector(double *v) {
+    free(v);
 }
+
+void free_matrix(float **m) {
+    if (m[0] != NULL) {
+        free(m[0]); 
+    }
+    free(m); 
+}
+
+
+void free_dmatrix(double **m) {
+    free(m[0]); // Free the data array
+    free(m); // Free the array of pointers
+}
+

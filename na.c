@@ -16,10 +16,10 @@ void gauss_jordan_partial(float **A, int N) {
     int i, j, k, max_row;
     double pivot, factor; // Use double for intermediate precision
 
-    for (i = 1; i <= N; i++) { // Loop through pivot columns 1 to N
+    for (i = 0; i < N; i++) { // Loop through pivot columns 1 to N
         // --- Partial Pivoting ---
         max_row = i;
-        for (k = i + 1; k <= N; k++) {
+        for (k = i + 1; k < N; k++) {
             if (fabs(A[k][i]) > fabs(A[max_row][i])) {
                 max_row = k;
             }
@@ -29,7 +29,7 @@ void gauss_jordan_partial(float **A, int N) {
         #ifndef MACRO_SWAP
         // Swap rows
         if (max_row != i) {
-            for (int j = 1; j <= N + 1; j++) {
+            for (int j = 0; j <= N ; j++) {
                 double temp = A[i][j];
                 A[i][j] = A[max_row][j];
                 A[max_row][j] = temp;
@@ -40,7 +40,7 @@ void gauss_jordan_partial(float **A, int N) {
         #ifdef MACRO_SWAP
         /* Alternatively */
         if (max_row != i) 
-            for (j = 1; j<=N+1; j++) SWAP(A[i][j], A[max_row][j]);
+            for (j = 0; j<=N; j++) SWAP(A[i][j], A[max_row][j]);
         #endif
 
         // --- Normalization ---
@@ -52,13 +52,13 @@ void gauss_jordan_partial(float **A, int N) {
         }
 
         // Divide pivot row by pivot value (Optimized: start from column i)
-        for (j = i; j <= N + 1; j++) {
+        for (j = i; j <= N ; j++) {
             A[i][j] /= pivot;
         }
         // A[i][i] is now 1.0
 
         // --- Elimination ---
-        for (k = 1; k <= N; k++) {
+        for (k = 0; k < N; k++) {
             if (k == i) continue; // Skip pivot row
 
             factor = A[k][i]; // Factor for row k, column i
@@ -66,7 +66,7 @@ void gauss_jordan_partial(float **A, int N) {
             // Eliminate elements in column i for row k
             // Subtract factor * (pivot row) from row k
             // (Optimized: start from column i)
-            for (j = i; j <= N + 1; j++) { // CORRECTED loop: 1-based, starts at i, goes to N+1
+            for (j = i; j <= N ; j++) { // CORRECTED loop: 1-based, starts at i, goes to N+1
                 A[k][j] -= factor * A[i][j];
             }
             // A[k][i] is now 0.0
@@ -78,8 +78,8 @@ void gauss_jordan_partial(float **A, int N) {
 
 // --- Helper: Check for Matrix Symmetry ---
 int is_symmetric(float **a, int n) {
-    for (int i = 1; i <= n; i++) {
-        for (int j = i + 1; j <= n; j++) { // Only check upper triangle against lower
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) { // Only check upper triangle against lower
             if (fabs(a[i][j] - a[j][i]) > TOL) {
                 fprintf(stderr, "Symmetry Check Failed: A[%d][%d] (%.4f) != A[%d][%d] (%.4f)\n",
                         i, j, a[i][j], j, i, a[j][i]);
@@ -91,8 +91,8 @@ int is_symmetric(float **a, int n) {
 }
 
 int is_symmetric_double(double **a, int n) {
-    for (int i = 1; i <= n; i++) {
-       for (int j = i + 1; j <= n; j++) {
+    for (int i = 0; i < n; i++) {
+       for (int j = i + 1; j < n; j++) {
            if (fabs(a[i][j] - a[j][i]) > TOL_DOUBLE) return 0; // Use fabs and TOL_DOUBLE
        }
    }
@@ -108,10 +108,10 @@ void cholesky(float **A, int n)
     int i, j, k;
     float sum;
 
-    for (i = 1; i <= n; i++) {
-        for (j = 1; j <= i; j++) {
+    for (i = 0; i < n; i++) {
+        for (j = 0; j <= i; j++) {
             sum = A[i][j];
-            for (k = 1; k <= j - 1; k++){
+            for (k = 0; k < j; k++){
                 sum -= A[i][k] * A[j][k];
         }
         if (i==j) {
@@ -127,8 +127,8 @@ void cholesky(float **A, int n)
     }
 
     /* Zero out the upper triangular part of the matrix for clarity */
-    for (i = 1; i<=n ; i++){
-        for (j=i+1; j<=n ;j++){
+    for (i = 0; i<n ; i++){
+        for (j=i+1; j<n ;j++){
             A[i][j] = 0.0;
         }
     }
@@ -142,18 +142,18 @@ void cholesky_solve(float **A, float *b, float *x, int n)
     float sum;
 
     // Forward substitution to solve Ly = b
-    for (i = 1; i <= n; i++) {
+    for (i = 0; i < n; i++) {
         sum = b[i];
-        for (j = 1; j <= i - 1; j++){
+        for (j = 0; j < i ; j++){
             sum -= A[i][j] * x[j];
         }
         x[i] = sum / A[i][i];
     }
 
     // Back substitution to solve Ux = y
-    for (i = n; i >= 1; i--) {
+    for (i = n-1; i >= 0; i--) {
         sum = x[i];
-        for (j = i + 1; j <= n; j++){
+        for (j = i + 1; j < n; j++){
             sum -= A[j][i] * x[j];
         }
         x[i] = sum / A[i][i];

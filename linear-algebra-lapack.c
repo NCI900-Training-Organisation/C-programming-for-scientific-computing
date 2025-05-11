@@ -3,16 +3,12 @@
 #include <stdlib.h>
 #include <string.h> // Needed for strcmp
 #include <math.h>   // Needed for fabs, sqrt
-
+#include "na.h"   
+#include "na_util.h"
 // Include LAPACKE header for C interface
 #include "mkl_lapacke.h"
 
-// Assuming na_util.h provides BOTH float and double versions:
-// float: vector, matrix, free_vector, free_matrix
-// double: dvector, dmatrix, free_dvector, free_dmatrix
-// And nrerror. Ensure these exist!
-#include "na.h"   
-#include "na_util.h"
+
 
 #define NP 5000     // Max N dimension
 #define MAXSTR 80
@@ -96,10 +92,10 @@ int main(int argc, char *argv[])
 
     // --- Allocate Primary Double Precision Structures ---
     // !!! Ensure your na_util provides these !!!
-    a_input = dmatrix(1, NP, 1, NP);
-    b_input = dvector(1, NP);
-    x = dvector(1, NP);        // Solution always stored as double
-    check = dvector(1, NP);    // Verification always uses double
+    a_input = dmatrix(NP,  NP);
+    b_input = dvector(NP);
+    x = dvector(NP);        // Solution always stored as double
+    check = dvector(NP);    // Verification always uses double
 
 
     // --- Open the specified input file ---
@@ -144,8 +140,8 @@ int main(int argc, char *argv[])
 
     // --- Read Matrix A (into double) ---
     printf("Reading Matrix A (%d x %d) as double:\n", n, n);
-    for (k = 1; k <= n; k++) {
-        for (l = 1; l <= n; l++) {
+    for (k = 0; k < n; k++) {
+        for (l = 0; l < n; l++) {
             if (fscanf(fp, "%lf", &a_input[k][l]) != 1) { nrerror("Error reading matrix A data");}
         }
     }
@@ -156,7 +152,7 @@ int main(int argc, char *argv[])
 
     // --- Read Vector b (into double) ---
     printf("Reading Vector b (%d x 1) as double:\n", n);
-    for (k = 1; k <= n; k++) {
+    for (k = 0; k < n; k++) {
          if (fscanf(fp, "%lf", &b_input[k]) != 1) { nrerror("Error reading vector b data");}
          // Consume rest of line in case M > 1 was specified
          while (fgetc(fp) != '\n' && !feof(fp));
@@ -173,15 +169,15 @@ int main(int argc, char *argv[])
 
     if (method == CHOLESKY_LAPACK) {
         // Allocate double copy based on actual size n
-        a_chol_lapack = dmatrix(1, n, 1, n);
-        for(k=1; k<=n; ++k) for(l=1; l<=n; ++l) a_chol_lapack[k][l] = a_input[k][l];
+        a_chol_lapack = dmatrix(n,  n);
+        for(k=0; k<n; ++k) for(l=0; l<n; ++l) a_chol_lapack[k][l] = a_input[k][l];
 
         printf("\nAttempting Cholesky Decomposition using LAPACKE_dpotrf...\n");
         if (!is_symmetric_double(a_chol_lapack, n)) {
             fprintf(stderr, "ERROR: Matrix A is not symmetric. Cholesky method cannot be used.\n");
             solve_success = 0;
             // Free memory allocated ONLY for this block if failing early
-            free_dmatrix(a_chol_lapack, 1, 1); a_chol_lapack = NULL;
+            free_dmatrix(a_chol_lapack); a_chol_lapack = NULL;
         } else {
             printf("Matrix appears symmetric. Proceeding with LAPACK.\n");
             // Allocate 1D arrays
@@ -190,8 +186,8 @@ int main(int argc, char *argv[])
             if (!a_lapack_1d || !b_lapack_1d) nrerror("Memory allocation failed for LAPACK arrays");
 
             // Copy to 1D arrays
-            for (k = 1; k <= n; k++) for (l = 1; l <= n; l++) a_lapack_1d[(k - 1) * n + (l - 1)] = a_chol_lapack[k][l];
-            for (k = 1; k <= n; k++) b_lapack_1d[k - 1] = b_input[k];
+            for (k = 0; k < n; k++) for (l = 0; l < n; l++) a_lapack_1d[k  * n + l ] = a_chol_lapack[k][l];
+            for (k = 0; k < n; k++) b_lapack_1d[k] = b_input[k];
 
             // Call LAPACKE_dpotrf
             info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n, a_lapack_1d, n);
@@ -200,55 +196,55 @@ int main(int argc, char *argv[])
                 // Call LAPACKE_dpotrs
                 info = LAPACKE_dpotrs(LAPACK_ROW_MAJOR, 'U', n, 1, a_lapack_1d, n, b_lapack_1d, 1);
                 if (info != 0) { /* error handling */ solve_success = 0; }
-                else { /* copy solution */ for (k = 1; k <= n; k++) x[k] = b_lapack_1d[k - 1]; }
+                else { /* copy solution */ for (k = 0; k < n; k++) x[k] = b_lapack_1d[k]; }
             }
             // Free 1D arrays
             if(a_lapack_1d) {free(a_lapack_1d); a_lapack_1d = NULL;}
             if(b_lapack_1d) {free(b_lapack_1d); b_lapack_1d = NULL;}
             // Free NR copy
-            if(a_chol_lapack) {free_dmatrix(a_chol_lapack, 1, 1); a_chol_lapack = NULL;}
+            if(a_chol_lapack) {free_dmatrix(a_chol_lapack); a_chol_lapack = NULL;}
         }
 
     } else if (method == CHOLESKY_CUSTOM) {
         // Allocate float structures based on actual size n
-        a_chol_custom = matrix(1, n, 1, n);
-        b_custom = vector(1, n);
-        x_custom = vector(1, n);
+        a_chol_custom = matrix(n,  n);
+        b_custom = vector(n);
+        x_custom = vector(n);
 
         // Copy double input to float structures
-        for(k=1; k<=n; ++k) b_custom[k] = (float)b_input[k];
-        for(k=1; k<=n; ++k) for(l=1; l<=n; ++l) a_chol_custom[k][l] = (float)a_input[k][l];
+        for(k=0; k<n; ++k) b_custom[k] = (float)b_input[k];
+        for(k=0; k<n; ++k) for(l=0; l<n; ++l) a_chol_custom[k][l] = (float)a_input[k][l];
 
         printf("\nAttempting Custom Cholesky Decomposition (Float)...\n");
         if (!is_symmetric(a_chol_custom, n)) { // Use float version of is_symmetric
             fprintf(stderr, "ERROR: Matrix A is not symmetric...\n");
             solve_success = 0;
             // Free memory allocated ONLY for this block if failing early
-            free_matrix(a_chol_custom, 1, 1); a_chol_custom = NULL;
-            free_vector(b_custom, 1, n); b_custom = NULL; // Use n here if free_vector needs nh
-            free_vector(x_custom, 1, n); x_custom = NULL; // Use n here if free_vector needs nh
+            free_matrix(a_chol_custom); a_chol_custom = NULL;
+            free_vector(b_custom); b_custom = NULL; // Use n here if free_vector needs nh
+            free_vector(x_custom); x_custom = NULL; // Use n here if free_vector needs nh
         } else {
             printf("Matrix appears symmetric. Proceeding...\n");
             cholesky(a_chol_custom, n);
             // print_nr_matrix(a_chol_custom, 1, n, 1, n, "Decomposed A (Float)");
             cholesky_solve(a_chol_custom, b_custom, x_custom, n);
-            for(k=1; k<=n; ++k) x[k] = (double)x_custom[k]; // Copy solution to double x
+            for(k=0; k<n; ++k) x[k] = (double)x_custom[k]; // Copy solution to double x
 
             // Free memory after successful use
-            free_matrix(a_chol_custom, 1, 1); a_chol_custom = NULL;
-            free_vector(b_custom, 1, n); b_custom = NULL; // Use n here
-            free_vector(x_custom, 1, n); x_custom = NULL; // Use n here
+            free_matrix(a_chol_custom); a_chol_custom = NULL;
+            free_vector(b_custom); b_custom = NULL; // Use n here
+            free_vector(x_custom); x_custom = NULL; // Use n here
         }
 
     } else { // GAUSS_JORDAN
         // Allocate float augmented matrix based on actual size n
-         Aug = matrix(1, n, 1, n + 1);
+         Aug = matrix(n,  n + 1);
 
          printf("\nAttempting Gauss-Jordan Elimination (Float)...\n");
          // Copy double input to float Aug matrix
-         for (k = 1; k <= n; k++) {
-             for (l = 1; l <= n; l++) { Aug[k][l] = (float)a_input[k][l]; }
-             Aug[k][n + 1] = (float)b_input[k];
+         for (k = 0; k < n; k++) {
+             for (l = 0; l < n; l++) { Aug[k][l] = (float)a_input[k][l]; }
+             Aug[k][n] = (float)b_input[k];
          }
          // print_nr_matrix(Aug, 1, n, 1, n + 1, "Initial Aug (Float)");
 
@@ -258,25 +254,25 @@ int main(int argc, char *argv[])
          // print_nr_matrix(Aug, 1, n, 1, n + 1, "Final Aug (Float)");
 
          // Extract solution x (convert float result back to double)
-         for (k = 1; k <= n; k++) {
-             x[k] = (double)Aug[k][n + 1];
+         for (k = 0; k < n; k++) {
+             x[k] = (double)Aug[k][n ];
          }
          // Free float augmented matrix
-         free_matrix(Aug, 1, 1); Aug = NULL;
+         free_matrix(Aug); Aug = NULL;
     } // end of solver methods
 
     // --- Print and Verify Solution (using double precision) ---
     if (solve_success) {
          //print_nr_dvector(x, 1, n, "Solution x (Double)"); // Use n here
          printf("Verifying solution (Calculating A * x)...\n");
-         for (k = 1; k <= n; k++) { // Use original double 'a_input'
+         for (k = 0; k < n; k++) { // Use original double 'a_input'
              check[k] = 0.0;
-             for (j = 1; j <= n; j++) { check[k] += a_input[k][j] * x[j]; }
+             for (j = 0; j < n; j++) { check[k] += a_input[k][j] * x[j]; }
          }
          //print_nr_dvector(check, 1, n, "Calculated A*x (Double)"); // Use n here
          printf("Comparing A*x with original b:\n");
          int errors = 0;
-         for (k = 1; k <= n; k++) {
+         for (k = 0; k < n; k++) {
               if (fabs(check[k] - b_input[k]) > TOL_FLOAT) { // Use double TOL
                   printf("  Mismatch at index [%d]: Expected %.6e, Got %.6e (Diff: %.4e)\n",
                          k, b_input[k], check[k], check[k] - b_input[k]); errors++;
@@ -291,10 +287,10 @@ int main(int argc, char *argv[])
     // --- Final Cleanup ---
     // Free structures allocated *outside* the loop (using NP)
     printf("Freeing memory...\n");
-    if(a_input) free_dmatrix(a_input, 1, 1); // Use 1,1 for nrl,ncl
-    if(b_input) free_dvector(b_input, 1, NP); // Use NP if allocated with NP
-    if(x) free_dvector(x, 1, NP);       // Use NP if allocated with NP
-    if(check) free_dvector(check, 1, NP); // Use NP if allocated with NP
+    if(a_input) free_dmatrix(a_input); // Use 1,1 for nrl,ncl
+    if(b_input) free_dvector(b_input); // Use NP if allocated with NP
+    if(x) free_dvector(x);       // Use NP if allocated with NP
+    if(check) free_dvector(check); // Use NP if allocated with NP
 
     // Structures allocated inside the processing block should be NULL now
     // ASSERT(Aug == NULL);

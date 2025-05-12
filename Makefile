@@ -30,8 +30,8 @@ SRC_BASE = linear-algebra-multisolver.c         # Original "base" solver
 
 
 # Common utility/solver sources
-SRC_NA_UTIL = na_util.c             # Utility functions (used by all)
-SRC_NA_OLD = na.c                   # Old NA functions (used by original solvers)
+SRC_NA_UTIL = util.c             # Utility functions (used by all)
+SRC_NA_OLD = primitives.c                   # Old NA functions (used by original solvers)
 #SRC_NA_NEW = na_solvers.c           # New NA functions (used by main multi-solver)
 
 # --- Object Files ---

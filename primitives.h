@@ -1,5 +1,5 @@
-#ifndef _NUMERICAL_ALGORITHMS_H
-#define _NUMERICAL_ALGORITHMS_H
+#ifndef PRIMITIVES_H
+#define PRIMITIVES_H
 
 
 void cholesky(float **A, int n);

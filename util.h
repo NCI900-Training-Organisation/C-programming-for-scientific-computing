@@ -1,5 +1,5 @@
-#ifndef NA_UTIL_H
-#define NA_UTIL_H
+#ifndef UTIL_H
+#define UTIL_H
 
 void nrerror(char error_text[]);
 

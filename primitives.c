@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "na_util.h"
-#include "na.h"
+#include "util.h"
+#include "primitives.h"
 
 #define TOL 1.0e-6 
 #define TOL_DOUBLE 1.0e-9

@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h> // Needed for fabs in verification step
-#include "na.h"   // Assumed to contain the definition of gauss_jordan_partial
-#include "na_util.h" // Assumed to contain matrix(), free_matrix(), vector(), free_vector(), nrerror()
+#include <math.h> 
+#include "primitives.h"   
+#include "util.h" 
 
 #define NP 20       // Max N dimension
 #define MAXSTR 80
@@ -11,21 +11,15 @@
 
 
 
-// --- Forward Declarations ---
-int is_symmetric(float **a, int n);
-void gauss_jordan_partial(float **A, int N);
-
-
-
 // --- Main function modified ---
 int main(int argc, char *argv[])
 {
-    // ... [Declarations and Argument Parsing remain the same] ...
+    // Declarations
     int j, k, l, n;
     int m_read;
-    float **a, **Aug, **a_chol;
+    float **A, **Aug, **A_chol;
     float *b, *x, *check;
-    char dummy[MAXSTR];
+    char buffer[MAXSTR];
     FILE *fp;
     char *input_filename = NULL;
 
@@ -41,11 +35,11 @@ int main(int argc, char *argv[])
 
 
     // --- Allocate Matrices/Vectors (remains the same) ---
-    a = matrix(NP, NP);
+    A = matrix(NP, NP);
     b = vector(NP);
     x = vector(NP);
     Aug = matrix(NP, NP + 1);
-    a_chol = matrix(NP, NP);
+    A_chol = matrix(NP, NP);
     check = vector(NP);
 
     // --- Open the specified input file (remains the same) ---
@@ -54,8 +48,8 @@ int main(int argc, char *argv[])
     printf("Successfully opened file.\n");
 
     // --- Consume Initial Header Lines (remains the same) ---
-    if (fgets(dummy, MAXSTR, fp) == NULL) { /* Handle error */ }
-    if (fgets(dummy, MAXSTR, fp) == NULL) { /* Handle error */ }
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
 
 
     // --- Loop to process systems of equations ---
@@ -66,25 +60,25 @@ int main(int argc, char *argv[])
 // ... [This part remains the same: read N, M, headers before A, matrix A, headers before b, vector b] ...
     if (n <= 0 || n > NP) { /* Validation */ }
     if (m_read != 1) { /* Warning */ }
-    fgets(dummy, MAXSTR, fp); // Consume rest of N M line
-    fgets(dummy, MAXSTR, fp); // Consume header before A
+    fgets(buffer, MAXSTR, fp); // Consume rest of N M line
+    fgets(buffer, MAXSTR, fp); // Consume header before A
 
     printf("\n--- Processing System (N=%d) from %s ---\n", n, input_filename);
     printf("Reading Matrix A (%d x %d):\n", n, n);
     for (k = 0; k < n; k++) { // Read A
         for (l = 0; l < n; l++) {
-            if (fscanf(fp, "%f", &a[k][l]) != 1) { nrerror("Error reading matrix A");}
+            if (fscanf(fp, "%f", &A[k][l]) != 1) { nrerror("Error reading matrix A");}
         }
     }
-    fgets(dummy, MAXSTR, fp); // Consume line after A
-    fgets(dummy, MAXSTR, fp); // Consume header before b
+    fgets(buffer, MAXSTR, fp); // Consume line after A
+    fgets(buffer, MAXSTR, fp); // Consume header before b
 
     printf("Reading Vector b (%d x 1):\n", n);
     for (k = 0; k < n; k++) { // Read b
         if (fscanf(fp, "%f", &b[k]) != 1) { nrerror("Error reading vector b");}
     }
 
-    print_matrix(a, n,  n, "Original A");
+    print_matrix(A, n,  n, "Original A");
     print_vector(b,  n, "Original b");
 
 
@@ -94,7 +88,7 @@ int main(int argc, char *argv[])
     // ... [Gauss-Jordan logic remains the same] ...
     printf("\nAttempting Gauss-Jordan Elimination...\n");
     for (k = 0; k < n; k++) {
-        for (l = 0; l < n; l++) { Aug[k][l] = a[k][l]; }
+        for (l = 0; l < n; l++) { Aug[k][l] = A[k][l]; }
         Aug[k][n ] = b[k];
     }
     print_matrix(Aug, n,  n + 1, "Initial Augmented [A|b]");
@@ -111,7 +105,7 @@ int main(int argc, char *argv[])
             printf("Verifying solution (Calculating A * x)...\n");
             for (k = 0; k < n; k++) {
                 check[k] = 0.0;
-                for (j = 0; j < n; j++) { check[k] += a[k][j] * x[j]; }
+                for (j = 0; j < n; j++) { check[k] += A[k][j] * x[j]; }
             }
             print_vector(check,  n, "Calculated A*x");
             printf("Comparing A*x with original b:\n");
@@ -138,11 +132,11 @@ int main(int argc, char *argv[])
 
     // --- Free Memory ---
     printf("Freeing memory...\n");
-    free_matrix(a);
+    free_matrix(A);
     free_vector(b);
     free_vector(x);
     free_matrix(Aug );
-    free_matrix(a_chol);
+    free_matrix(A_chol);
     free_vector(check);
 
     printf("Done.\n");

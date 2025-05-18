@@ -5,18 +5,18 @@
 #include "primitives.h"   
 #include "util.h" 
 
-#define NP 20       // Max N dimension
+#define MAX_SIZE 20       // Max N dimension
 #define MAXSTR 80
-#define TOL 1.0e-6 // Tolerance for verification
+#define TOL 1.0e-6 // tolerance 
 
 
 
-// --- Main function modified ---
+
 int main(int argc, char *argv[])
 {
-    // Declarations
-    int j, k, l, n;
-    int m_read;
+    // declarations
+    int j, k, l;
+    int n_row,m_col;
     float **A, **Aug, **A_chol;
     float *b, *x, *check;
     char buffer[MAXSTR];
@@ -24,105 +24,107 @@ int main(int argc, char *argv[])
     char *input_filename = NULL;
 
 
-    // --- Check Command-Line Arguments ---
+    // check command line arguments 
     if (argc != 2) {
-        // Print usage instruction to standard error
+        // print usage instruction to standard error
         fprintf(stderr, "Usage: %s <matrix_data_file>\n", argv[0]);
-        // Exit indicating an error
-        exit(EXIT_FAILURE); // Or return 1;
+        // exit indicating an error
+        exit(EXIT_FAILURE); // or return 1 (this is a unix thing);
     }
-    input_filename = argv[1]; // Get filename from the command line
+
+    input_filename = argv[1]; // get filename from the command line
 
 
-    // --- Allocate Matrices/Vectors (remains the same) ---
-    A = matrix(NP, NP);
-    b = vector(NP);
-    x = vector(NP);
-    Aug = matrix(NP, NP + 1);
-    A_chol = matrix(NP, NP);
-    check = vector(NP);
+    // --- allocate memory for matrices an vectors  ---
+    A = matrix(MAX_SIZE, MAX_SIZE);
+    b = vector(MAX_SIZE);
+    x = vector(MAX_SIZE);
+    Aug = matrix(MAX_SIZE, MAX_SIZE + 1);
+    A_chol = matrix(MAX_SIZE, MAX_SIZE);
+    check = vector(MAX_SIZE);
 
-    // --- Open the specified input file (remains the same) ---
+    //  input file 
     printf("Input file: %s\n", input_filename);
-    if ((fp = fopen(input_filename, "r")) == NULL) { /* error */ nrerror("..."); }
+    if ((fp = fopen(input_filename, "r")) == NULL) { /* Todo: Handle error */ nrerror("..."); }
     printf("Successfully opened file.\n");
 
-    // --- Consume Initial Header Lines (remains the same) ---
-    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
-    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
+    // --- consume initial header ---
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
 
 
-    // --- Loop to process systems of equations ---
+    // process the system 
     printf("\nStarting to read systems from file...\n");
-    if(fscanf(fp, "%d %d", &n, &m_read) != 2){}
+    if(fscanf(fp, "%d %d", &n_row, &m_col) != 2){}
 
-// --- Validation and Header Consumption for A and b ---
-// ... [This part remains the same: read N, M, headers before A, matrix A, headers before b, vector b] ...
-    if (n <= 0 || n > NP) { /* Validation */ }
-    if (m_read != 1) { /* Warning */ }
-    fgets(buffer, MAXSTR, fp); // Consume rest of N M line
-    fgets(buffer, MAXSTR, fp); // Consume header before A
+// --- validation and header consumption for A and b ---
+    if (n_row <= 0 || n_row > MAX_SIZE) { /* Todo: Handle validation*/ }
+    if (m_col != 1) { /* Todo: handle validation */ }
+    fgets(buffer, MAXSTR, fp); // consume rest of N M line
+    fgets(buffer, MAXSTR, fp); // consume header before A
 
-    printf("\n--- Processing System (N=%d) from %s ---\n", n, input_filename);
-    printf("Reading Matrix A (%d x %d):\n", n, n);
-    for (k = 0; k < n; k++) { // Read A
-        for (l = 0; l < n; l++) {
+    printf("\n--- Processing System (N=%d) from %s ---\n", n_row, input_filename);
+    printf("Reading Matrix A (%d x %d):\n", n_row, n_row);
+    for (k = 0; k < n_row; k++) { // Read A
+        for (l = 0; l < n_row; l++) {
             if (fscanf(fp, "%f", &A[k][l]) != 1) { nrerror("Error reading matrix A");}
         }
     }
     fgets(buffer, MAXSTR, fp); // Consume line after A
     fgets(buffer, MAXSTR, fp); // Consume header before b
 
-    printf("Reading Vector b (%d x 1):\n", n);
-    for (k = 0; k < n; k++) { // Read b
+    printf("Reading Vector b (%d x 1):\n", n_row);
+    for (k = 0; k < n_row; k++) { // Read b
         if (fscanf(fp, "%f", &b[k]) != 1) { nrerror("Error reading vector b");}
     }
 
-    print_matrix(A, n,  n, "Original A");
-    print_vector(b,  n, "Original b");
+    print_matrix(A, n_row,  n_row, "Original A");
+    print_vector(b,  n_row, "Original b");
 
 
-    // --- Solve using selected method ---
+    // --- solve using selected method ---
     int solve_success = 1;
     // GAUSS_JORDAN
-    // ... [Gauss-Jordan logic remains the same] ...
     printf("\nAttempting Gauss-Jordan Elimination...\n");
-    for (k = 0; k < n; k++) {
-        for (l = 0; l < n; l++) { Aug[k][l] = A[k][l]; }
-        Aug[k][n ] = b[k];
+    for (k = 0; k < n_row; k++) {
+        for (l = 0; l < n_row; l++) { Aug[k][l] = A[k][l]; }
+        Aug[k][n_row] = b[k];
     }
-    print_matrix(Aug, n,  n + 1, "Initial Augmented [A|b]");
-    gauss_jordan_partial(Aug, n); // Modifies Aug, might exit
+
+    print_matrix(Aug, n_row,  n_row + 1, "initial Augmented [A|b]");
+    gauss_jordan_partial(Aug, n_row); // Modifies Aug, might exit
     printf("Gauss-Jordan complete.\n");
-    print_matrix(Aug, n, n + 1, "Final Augmented [I|x]");
-    for (k = 0; k < n; k++) { x[k] = Aug[k][n ]; }
+    print_matrix(Aug, n_row, n_row + 1, "Final Augmented [I|x]");
+    for (k = 0; k < n_row; k++)  x[k] = Aug[k][n_row]; 
 
 
-    // --- Print and Verify Solution ---
+    // --- print and verify solution ---
     if (solve_success) {
-        // ... [Verification logic remains the same] ...
-            print_vector(x, n, "Solution x");
-            printf("Verifying solution (Calculating A * x)...\n");
-            for (k = 0; k < n; k++) {
-                check[k] = 0.0;
-                for (j = 0; j < n; j++) { check[k] += A[k][j] * x[j]; }
+        print_vector(x, n_row, "Solution x");
+        printf("Verifying solution (Calculating A * x)...\n");
+        for (k = 0; k < n_row; k++) {
+            check[k] = 0.0;
+            for (j = 0; j < n_row; j++) { check[k] += A[k][j] * x[j]; }
+        }
+        print_vector(check,  n_row, "Calculated A*x");
+        printf("Comparing A*x with original b:\n");
+        
+        int errors = 0;
+        for (k = 0; k < n_row; k++) {
+            if (fabs(check[k] - b[k]) > TOL) {
+                printf("  Mismatch at index [%d]: ...\n", k); errors++;
             }
-            print_vector(check,  n, "Calculated A*x");
-            printf("Comparing A*x with original b:\n");
-            int errors = 0;
-            for (k = 0; k < n; k++) {
-                if (fabs(check[k] - b[k]) > TOL) {
-                    printf("  Mismatch at index [%d]: ...\n", k); errors++;
-                }
-            }
-            if (errors == 0) { printf("  Verification successful...\n"); }
-            else { printf("  Verification FAILED...\n"); }
+        }
+        if (errors == 0) { printf("  Verification successful...\n"); }
+        else { printf("  Verification FAILED...\n"); }
 
     } else {
             printf("\nSkipping verification for this system due to solver incompatibility or failure.\n");
     }
-    printf("\n------------------------------------\n\n"); // Separator
 
+    printf("\n------------------------------------\n\n"); // separator
+
+    /* check if the file has been consumed completely. */
     if (!feof(fp)) {
         fprintf(stderr, "Warning: File processing stopped before reaching end-of-file. Check file format near last processed system.\n");
     }

@@ -1,5 +1,3 @@
-# Makefile for Compiling Multiple Linear Algebra Solvers (incl. MKL)
-
 # --- Compiler ---
 CC = gcc
 
@@ -8,19 +6,16 @@ MKL_INCLUDE_PATH = /opt/intel/oneapi/mkl/latest/include
 MKL_LIB_PATH = /opt/intel/oneapi/mkl/latest/lib
 
 # --- Flags ---
-# Include paths used by all compilations (MKL path needed for linear_solver_main.c)
+# include dirctories for preprocessor (needed for MKL)
 CPPFLAGS = -I. -I$(MKL_INCLUDE_PATH)
 # Standard compiler flags used by all compilations
-CFLAGS = -Wall -Wextra -g -O2
-# Standard linker flags (usually empty unless specific paths needed for non-MKL)
-LDFLAGS =
-# MKL-specific linker flags (library path and runtime path)
+CFLAGS = -Wall -Wextra -g 
+
+# dybnamic linking during runtime
 LDFLAGS_MKL = -L$(MKL_LIB_PATH) -Wl,-rpath=$(MKL_LIB_PATH)
 # Standard libraries (math library)
 LDLIBS = -lm
-# MKL-specific libraries (choose sequential or threaded)
-# MKL_LIBS = -lmkl_intel_lp64 -lmkl_core -lmkl_sequential
-MKL_LIBS = -lmkl_rt # Simpler dynamic linking
+MKL_LIBS = -lmkl_rt #lapack uses multithreaded MKL
 
 # --- Source Files ---
 # Main program sources

@@ -3,7 +3,6 @@
 
 void nrerror(char error_text[]);
 
-
 void print_matrix(float **mat, long length_row, long length_col, const char *name);
 
 void print_vector(float *vec, long length, const char *name);

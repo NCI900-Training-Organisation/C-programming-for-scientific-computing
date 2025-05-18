@@ -14,10 +14,10 @@
 void gauss_jordan_partial(float **A, int N) {
 
     int i, j, k, max_row;
-    double pivot, factor; // Use double for intermediate precision
+    double pivot, factor; 
 
     for (i = 0; i < N; i++) { // Loop through pivot columns 1 to N
-        // --- Partial Pivoting ---
+        // partial pivoting 
         max_row = i;
         for (k = i + 1; k < N; k++) {
             if (fabs(A[k][i]) > fabs(A[max_row][i])) {
@@ -43,57 +43,52 @@ void gauss_jordan_partial(float **A, int N) {
             for (j = 0; j<=N; j++) SWAP(A[i][j], A[max_row][j]);
         #endif
 
-        // --- Normalization ---
+        // normalisation 
         pivot = A[i][i];
         if (fabs(pivot) < 1e-12) {
-            // nrerror("gauss_jordan: Matrix is singular or nearly singular.");
+            nrerror("gauss_jordan: Matrix is singular or nearly singular.");
             fprintf(stderr,"gauss_jordan: Matrix is singular or nearly singular at pivot %d.\n", i);
-            exit(1); // Or return an error code
+            exit(1); 
         }
 
-        // Divide pivot row by pivot value (Optimized: start from column i)
         for (j = i; j <= N ; j++) {
             A[i][j] /= pivot;
         }
-        // A[i][i] is now 1.0
 
-        // --- Elimination ---
+
+        // elimination 
         for (k = 0; k < N; k++) {
-            if (k == i) continue; // Skip pivot row
+            if (k == i) continue; // skip pivot row
 
-            factor = A[k][i]; // Factor for row k, column i
+            factor = A[k][i]; // factor for row k, column i
 
-            // Eliminate elements in column i for row k
-            // Subtract factor * (pivot row) from row k
-            // (Optimized: start from column i)
-            for (j = i; j <= N ; j++) { // CORRECTED loop: 1-based, starts at i, goes to N+1
+            for (j = i; j <= N ; j++) { 
                 A[k][j] -= factor * A[i][j];
             }
-            // A[k][i] is now 0.0
         }
     }
 }
 
 
 
-// --- Helper: Check for Matrix Symmetry ---
+// helper function: check for symmetry matrix
 int is_symmetric(float **a, int n) {
     for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) { // Only check upper triangle against lower
+        for (int j = i + 1; j < n; j++) { // only check upper triangle against lower
             if (fabs(a[i][j] - a[j][i]) > TOL) {
                 fprintf(stderr, "Symmetry Check Failed: A[%d][%d] (%.4f) != A[%d][%d] (%.4f)\n",
                         i, j, a[i][j], j, i, a[j][i]);
-                return 0; // Not symmetric
+                return 0; // not symmetric
             }
         }
     }
-    return 1; // Symmetric
+    return 1; // symmetric
 }
 
 int is_symmetric_double(double **a, int n) {
     for (int i = 0; i < n; i++) {
        for (int j = i + 1; j < n; j++) {
-           if (fabs(a[i][j] - a[j][i]) > TOL_DOUBLE) return 0; // Use fabs and TOL_DOUBLE
+           if (fabs(a[i][j] - a[j][i]) > TOL_DOUBLE) return 0; // 
        }
    }
    return 1;
@@ -126,7 +121,7 @@ void cholesky(float **A, int n)
         }
     }
 
-    /* Zero out the upper triangular part of the matrix for clarity */
+    /* zero out the upper triangular part of the matrix for clarity */
     for (i = 0; i<n ; i++){
         for (j=i+1; j<n ;j++){
             A[i][j] = 0.0;
@@ -136,12 +131,12 @@ void cholesky(float **A, int n)
 
 
 void cholesky_solve(float **A, float *b, float *x, int n)
-/* Solve the system Ax = b using Cholesky decomposition */
+/* solve the system Ax = b using Cholesky decomposition */
 {
     int i, j;
     float sum;
 
-    // Forward substitution to solve Ly = b
+    // forward substitution to solve Ly = b
     for (i = 0; i < n; i++) {
         sum = b[i];
         for (j = 0; j < i ; j++){
@@ -150,7 +145,7 @@ void cholesky_solve(float **A, float *b, float *x, int n)
         x[i] = sum / A[i][i];
     }
 
-    // Back substitution to solve Ux = y
+    // back substitution to solve Ux = y
     for (i = n-1; i >= 0; i--) {
         sum = x[i];
         for (j = i + 1; j < n; j++){

@@ -11,7 +11,7 @@
 #define TOL_DOUBLE 1.0e-9
 
 
-// --- Solver Method Enum 
+// define solver method
 typedef enum { GAUSS_JORDAN, CHOLESKY } SolverMethod;
 
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
          input_filename = argv[2];
          if (argc > 3) fprintf(stderr, "Warning: Extra arguments ignored.\n");
      } else {
-         input_filename = argv[1]; // Assume filename is first argument
+         input_filename = argv[1]; 
          if (argc > 2) fprintf(stderr, "Warning: Treating '%s' as filename. Use -g or -c flag.\n", argv[1]);
      }
 
@@ -60,8 +60,8 @@ int main(int argc, char *argv[])
     printf("Successfully opened file.\n");
 
 
-    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
-    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Handle error */ }
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
+    if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
 
 
     // process the system 

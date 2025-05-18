@@ -15,7 +15,7 @@
 #define TOL_FLOAT 1.0e-6  // Tolerance for float comparisons
 #define TOL_DOUBLE 1.0e-9 // Tolerance for double comparisons
 
-// --- Solver Method Enum ---
+// define solver method
 typedef enum { GAUSS_JORDAN, CHOLESKY_CUSTOM, CHOLESKY_LAPACK } SolverMethod;
 
 
@@ -34,10 +34,10 @@ int main(int argc, char *argv[])
     double *x;
     double *check; 
 
-    // Structures for specific solvers
-    float **A_chol_custom; 
-    float *b_custom; 
-    float *x_custom;
+    // for using primitive cholesky method
+    float **A_chol_primitive; 
+    float *b_primitive; 
+    float *x_primitive;
 
     double **A_chol_lapack; 
 
@@ -192,40 +192,40 @@ int main(int argc, char *argv[])
                 else { /* copy solution */ for (k = 0; k < n_row; k++) x[k] = b_lapack_1d[k]; }
             }
             // Free 1D arrays
-            if(A_lapack_1d) {free(A_lapack_1d); A_lapack_1d = NULL;}
-            if(b_lapack_1d) {free(b_lapack_1d); b_lapack_1d = NULL;}
-            if(A_chol_lapack) {free_dmatrix(A_chol_lapack); A_chol_lapack = NULL;}
+            free(A_lapack_1d); A_lapack_1d = NULL; //good practice to set to NULL after free
+            free(b_lapack_1d); b_lapack_1d = NULL;
+            free_dmatrix(A_chol_lapack); A_chol_lapack = NULL;
         }
 
     } else if (method == CHOLESKY_CUSTOM) {
-        // allocate float structures based on actual size n
-        A_chol_custom = matrix(n_row,  n_row);
-        b_custom = vector(n_row);
-        x_custom = vector(n_row);
 
-        // Copy double input to float structures
+        A_chol_primitive = matrix(n_row,  n_row);
+        b_primitive = vector(n_row);
+        x_primitive = vector(n_row);
+
+        // copy double input to float structures
         for(k=0; k<n_row; ++k) b_custom[k] = (float)b[k];
         for(k=0; k<n_row; ++k) for(l=0; l<n_row; ++l) A_chol_custom[k][l] = (float)A[k][l];
 
         printf("\nAttempting Custom Cholesky Decomposition (Float)...\n");
-        if (!is_symmetric(A_chol_custom, n_row)) { 
+        if (!is_symmetric(A_chol_primitive, n_row)) { 
             fprintf(stderr, "ERROR: Matrix A is not symmetric...\n");
             solve_success = 0;
             // Free memory allocated ONLY for this block if failing early
-            free_matrix(A_chol_custom); A_chol_custom = NULL;
-            free_vector(b_custom); b_custom = NULL; 
-            free_vector(x_custom); x_custom = NULL; 
+            free_matrix(A_chol_primitive); A_chol_primitive = NULL;
+            free_vector(b_primitive); b_primitive = NULL; 
+            free_vector(x_primitive); x_primitive= NULL; 
         } else {
             printf("Matrix appears symmetric. Proceeding...\n");
-            cholesky(A_chol_custom, n_row);
+            cholesky(A_chol_primitive, n_row);
             // print_nr_matrix(a_chol_custom, 1, n, 1, n, "Decomposed A (Float)");
-            cholesky_solve(A_chol_custom, b_custom, x_custom, n_row);
+            cholesky_solve(A_chol_primitive, b_primitive, x_primitive, n_row);
             for(k=0; k<n_row; ++k) x[k] = (double)x_custom[k]; // copy solution to double x
 
             // Free memory after successful use
-            free_matrix(A_chol_custom); A_chol_custom = NULL;
-            free_vector(b_custom); b_custom = NULL; 
-            free_vector(x_custom); x_custom = NULL; 
+            free_matrix(A_chol_primitive); A_chol_primitive = NULL;
+            free_vector(b_primitive); b_primitive = NULL; 
+            free_vector(x_primitive); x_primitive = NULL; 
         }
 
     } else { // GJ
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     if (solve_success) {
          //print_nr_dvector(x, 1, n, "Solution x (Double)"); 
          printf("Verifying solution (Calculating A * x)...\n");
-         for (k = 0; k < n_row; k++) { // Use original double 'A'
+         for (k = 0; k < n_row; k++) { 
              check[k] = 0.0;
              for (j = 0; j < n_row; j++) { check[k] += A[k][j] * x[j]; }
          }
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
          printf("Comparing A*x with original b:\n");
          int errors = 0;
          for (k = 0; k < n_row; k++) {
-              if (fabs(check[k] - b[k]) > TOL_FLOAT) { // Use double TOL
+              if (fabs(check[k] - b[k]) > TOL_FLOAT) { 
                   printf("  Mismatch at index [%d]: Expected %.6e, Got %.6e (Diff: %.4e)\n",
                          k, b[k], check[k], check[k] - b[k]); errors++;
               }

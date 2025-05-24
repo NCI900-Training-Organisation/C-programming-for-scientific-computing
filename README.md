@@ -56,6 +56,34 @@ If memory allocation is successful, **malloc** returns a void pointer (void*) to
 > **Important:** Always check the return value of **malloc** to ensure allocation was successful before using the pointer. Remember to free memory allocated with **malloc** when it's no longer needed to prevent memory leaks.
 
 
+> **E.g.**
+```c
+/* Allocate memory for a vector of double-precision numbers */
+    float *b = (float *)malloc(n * sizeof(float)); 
+    // however, the vector has yet been initialised.
+```
+
+> **E.g.**
+```c
+    /* allocate memory for  the matrix */
+    float **A = (float **)malloc((size_t)n * sizeof(float *)); 
+    float *A_data = (float *)malloc((size_t)n * n * sizeof(float));
+    for (int i = 0; i < n; i++){
+        A[i] = A_data + (size_t) i * n; //link the data to the matrix
+    }
+```
+
+The **A** and **A_data** layout can be visualised as follows:
+```text
+A  --> [ptr_0] ----> A_data --> [val_00] [val_01] ... [val_0(n-1)]  <-- Row 0
+       [ptr_1] ----,            [val_10] [val_11] ... [val_1(n-1)]  <-- Row 1
+       [ptr_2] ----|-,          [val_20] [val_21] ... [val_2(n-1)]  <-- Row 2
+       ...         | `->        ...
+       [ptr_n-1] --`----->      [val_(n-1)0] ... [val_(n-1)(n-1)] <-- Row n-1
+```
+
+
+
 ## Command-Line Arguments
 
 When a program is executed from the command line, the command interpreter (e.g., `sh`/`bash` in Unix/Linux) parses the command line and passes information to the `main` function as:

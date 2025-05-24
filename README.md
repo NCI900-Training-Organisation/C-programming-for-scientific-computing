@@ -2,7 +2,6 @@
 
 ## Pointers 
 
-
 ## Pointers
 
 A pointer is a variable whose value is a memory address.
@@ -43,10 +42,10 @@ As the address of the variable **x** starts with address 0X00, the pointer varia
 
 | Segment       | Description                                                                        |
 |---------------|------------------------------------------------------------------------------------|
-| Text segment  | Program code.                                                                      |
+| Text segment  | Compiled program code (executable instructions)                                                                      |
 | Data segment  | Global variables, static variables.                                                |
-| Stack         | Local variables. Managed by the compiler.                                          |
-| Heap          | Dynamically allocated storage. Managed by standard library functions and the programmer. |
+| Stack         | Stores local variables, function arguments, and return addresses. Memory is managed automatically by the compiler.                                          |
+| Heap          | Used for dynamically allocated memory. Managed by the programmer using library functions (e.g., malloc, free in C; new, delete in C++).
 
 
 ![memory](fig/malloc.png)
@@ -54,7 +53,10 @@ As the address of the variable **x** starts with address 0X00, the pointer varia
 
 ![memory](fig/dynamic_mem.png)
 
-If the memory is allocated, **malloc** returns the pointer pointing at the beginning of the allocated memory. If the memory could not be allocated, then **malloc** returns a NULL pointer. (Remember to check return values.)
+If memory allocation is successful, **malloc** returns a void pointer (void*) to the beginning of the allocated memory block. This pointer can then be cast to the desired type. If memory allocation fails (e.g., not enough memory available), **malloc** returns a NULL pointer.
+
+> **Important:** Always check the return value of **malloc** to ensure allocation was successful before using the pointer. Remember to free memory allocated with **malloc** when it's no longer needed to prevent memory leaks.
+
 
 ## Command-line arguments refresher
 The command interpreter, for example sh/bash in unix parses the command line into two parts: an argument count (argc) which tells us how many command line arguments are given, and an array of pointers to char, known as the argument vector (argv). 

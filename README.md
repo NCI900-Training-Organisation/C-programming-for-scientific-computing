@@ -30,13 +30,13 @@ p = &i; // OK
 
 As the address of the variable **x** starts with address 0X00, the pointer variable **ptr** will have the value 0X00. 
 
-## Pointer Arithmetic
+**Pointer Arithmetic**
 
 ![memory](fig/pointers_arith_int.png)
 
 ![memory](fig/pointers_arith_char.png)
 
-## Memory allocation
+## Memory Allocation
 
 | Segment       | Description                                                                        |
 |---------------|------------------------------------------------------------------------------------|
@@ -56,7 +56,6 @@ If memory allocation is successful, **malloc** returns a void pointer (void*) to
 > **Important:** Always check the return value of **malloc** to ensure allocation was successful before using the pointer. Remember to free memory allocated with **malloc** when it's no longer needed to prevent memory leaks.
 
 
-## Command-line arguments refresher
 ## Command-Line Arguments
 
 When a program is executed from the command line, the command interpreter (e.g., `sh`/`bash` in Unix/Linux) parses the command line and passes information to the `main` function as:

@@ -64,7 +64,7 @@ When a program is executed from the command line, the command interpreter (e.g.,
 - **`argc`** (argument count): An integer representing the number of command-line arguments.  
 - **`argv`** (argument vector): An array of C-style strings (`char* argv[]` or `char** argv`), where each string is one of the arguments.
 
-**Example**
+> **E.g.**
 
 ```bash
 ./myprogram arg1 "another arg"
@@ -84,17 +84,34 @@ argv:
 +-----------+
 ```
 
-In order to provide utilities to users, we can parse the command-line arguments using strcmp:
+To provide utilities based on user input, you can parse command-line arguments. The strcmp function (from <string.h>) is useful for comparing strings:
 
+```c
 int strcmp ( const char * str1, const char * str2 );
+```
 
-it returns 0 if the contents of both string matches.
+It returns 0 if the contents of both string matches.
 
-E.g.
+> **E.g.**
+```c
+#include <stdio.h>
+#include <string.h>
 
-if (strcmp(argv[1], 'myflag') == 0 ){
-    
+int main(int argc, char *argv[]) {
+    if (argc > 1) { 
+        if (strcmp(argv[1], "--myflag") == 0) {
+            printf("myflag was detected!\n");
+        } else if (strcmp(argv[1], "--help") == 0) {
+            printf("Usage: %s [--myflag] [--help] ...\n", argv[0]);
+        } else {
+            printf("Unknown argument: %s\n", argv[1]);
+        }
+    } else {
+        printf("No arguments provided.\n");
+    }
+    return 0;
 }
+```
 
 
 

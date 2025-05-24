@@ -1,7 +1,5 @@
 # C-programming-sc
 
-## Pointers 
-
 ## Pointers
 
 A pointer is a variable whose value is a memory address.
@@ -59,18 +57,32 @@ If memory allocation is successful, **malloc** returns a void pointer (void*) to
 
 
 ## Command-line arguments refresher
-The command interpreter, for example sh/bash in unix parses the command line into two parts: an argument count (argc) which tells us how many command line arguments are given, and an array of pointers to char, known as the argument vector (argv). 
+## Command-Line Arguments
 
-E.g 
-./myprogram arg1 "another arg":
+When a program is executed from the command line, the command interpreter (e.g., `sh`/`bash` in Unix/Linux) parses the command line and passes information to the `main` function as:
 
-Argc: 3
+- **`argc`** (argument count): An integer representing the number of command-line arguments.  
+- **`argv`** (argument vector): An array of C-style strings (`char* argv[]` or `char** argv`), where each string is one of the arguments.
 
-Argv[0]
+**Example**
 
-Argv[1]
+```bash
+./myprogram arg1 "another arg"
+```
+In the above commannd line, we have the following layout:
 
-Argv[2]
+```text
+argv:
++-----------+     +---------------------------------------+
+| argv[0]   |---->| '.', '/', 'm', 'y', ..., 'm', '\0'    |  (Program name string)
++-----------+     +---------------------------------------+
+| argv[1]   |---->| 'a', 'r', 'g', '1', '\0'              |  (First argument string)
++-----------+     +---------------------------------------+
+| argv[2]   |---->| 'a', 'n', 'o', 't', ..., 'g', '\0'    |  (Second argument string)
++-----------+     +---------------------------------------+
+| argv[3]   |---->  NULL  (This is the NULL pointer terminating the `argv` array itself)
++-----------+
+```
 
 In order to provide utilities to users, we can parse the command-line arguments using strcmp:
 

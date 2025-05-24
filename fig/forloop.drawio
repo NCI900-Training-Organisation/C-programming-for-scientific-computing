@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net" modified="2024-04-01T03:41:56.058Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15" etag="Zw8IOOAgg2I3yVIP2jFQ" version="24.1.0" type="device">
+  <diagram name="Page-1" id="QNVAXEFG_coX6fo7xSKH">
+    <mxGraphModel dx="984" dy="667" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-1" value="&lt;font&gt;&lt;font size=&quot;5&quot;&gt;&lt;span style=&quot;caret-color: rgb(204, 0, 0);&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;for ( int i = 0; i &amp;lt; 10; i++ ) &amp;nbsp;&lt;/span&gt;&lt;/font&gt;&lt;font size=&quot;5&quot;&gt;&amp;nbsp;&lt;/font&gt;&lt;/font&gt;&lt;div style=&quot;font-size: 24px;&quot;&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;{ &amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;/font&gt;&amp;nbsp; &amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 24px;&quot;&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;}&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="380" width="440" height="211.25" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-4" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;rotation=90;fillColor=#fa6800;fontColor=#CC99FF;strokeColor=#C73500;" vertex="1" parent="1">
+          <mxGeometry x="150" y="387.5" width="50" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-5" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;rotation=90;fillColor=#fa6800;fontColor=#CC99FF;strokeColor=#C73500;" vertex="1" parent="1">
+          <mxGeometry x="204.38" y="384.38" width="50" height="46.25" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-15" value="Keyword" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="145" y="350" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-16" value="Control variable" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="190" y="350" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-67" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;rotation=90;fillColor=#fa6800;fontColor=#CC99FF;strokeColor=#C73500;" vertex="1" parent="1">
+          <mxGeometry x="300.01" y="375.63" width="50" height="57.5" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-68" value="Condition" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="280" y="346.87" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-69" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;rotation=90;fillColor=#fa6800;fontColor=#CC99FF;strokeColor=#C73500;" vertex="1" parent="1">
+          <mxGeometry x="367.83" y="387.82" width="50" height="33.13" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-70" value="Update control&lt;div&gt;variable&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="360" y="346.87" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-72" value="Initial value" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="250" y="490" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-73" value="final value" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="320" y="490" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-74" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;startSize=0;" edge="1" parent="1" source="DXjjxYE0g-5OhmQiskfD-72">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="680" y="470" as="sourcePoint" />
+            <mxPoint x="280" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="DXjjxYE0g-5OhmQiskfD-76" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;startSize=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350.01" y="490" as="sourcePoint" />
+            <mxPoint x="350.01" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

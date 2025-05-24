@@ -117,20 +117,89 @@ int main(int argc, char *argv[]) {
 
 ## File process
 
-The following C functions are used in our practice to process input files
+The following C standard library functions (from <stdio.h>) are commonly used for file input/output:
 
+```c
 FILE *fopen(const char *filename, const char *mode);
+```
+- Opens the file specified by `filename` in the mode specified by `mode` (e.g., `"r"` for read, `"w"` for write, `"a"` for append).  
+- Returns a `FILE *` if successful, or `NULL` if an error occurs.  
 
-E.g.fopen(inputfile, 'r');
+> **E.g.**
+```c
+FILE *fp = fopen("input.txt", "r");
+if (fp == NULL) {
+    fprintf(stderr, "Error opening file");
+}
+```
 
+```c
 char *fgets(char *str, int n, FILE *stream);
+```
 
-E.g. char buffer[256];
-fgets(buffer, sizeof(buffer), fp);
+- Reads a line from the specified stream and stores it into the string buffer.
+- It stops when (n-1) characters are read, the newline character is read, or the end-of-file is reached, whichever comes first.
+- It can be used to consume the file headers.
 
 
+> **E.g.**
+```c
+char buffer[256];
+if (fgets(buffer, MAXSTR, fp) != NULL )
+{
+ printf("Read line: %s", buffer);   
+};
+```
+
+
+
+```c
 int fscanf(FILE *stream, const char *format, ... );
-E.g.  float *b = (float *)malloc(n * sizeof(float));
-      for (int i = 0; i < n; i++){
-        fscanf(fp, "%f", &b[i]);
-      }
+```
+
+- Reads formatted input from a stream.
+- Works like **`scanf`**, but reads from a file stream instead of **`stdin`**.
+- Returns the number of input items successfully matched and assigned.
+
+
+> **E.g.**
+```c
+#include <stdio.h>
+#include <stdlib.h> 
+
+
+
+int n = 10; 
+float *b = (float *)malloc(n * sizeof(float));
+if (b == NULL) {
+    perror("Failed to allocate memory");
+    // Handle error
+} 
+else {
+    for (int i = 0; i < n; i++) {
+        if (fscanf(fp, "%f", &b[i]) != 1) { // read the floating number from file fp into the array b
+            fprintf(stderr, "Error reading float at index %d\n", i);
+            break; 
+        }
+    }
+    free(b); 
+}
+```
+
+
+
+```c
+int fclose(FILE *stream);
+```
+
+- Closes the stream.
+- Returns 0 if the stream is successfully closed.
+
+
+> **E.g.**
+```c
+if (fp != NULL) {
+    fclose(fp);
+}
+```
+

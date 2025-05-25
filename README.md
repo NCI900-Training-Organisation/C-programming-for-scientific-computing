@@ -1,4 +1,23 @@
-# C-programming-sc
+# Introduction - Program of the Day
+
+This workshop guides you through the process of writing robust linear algebra solver programs in C. More than just implementing algorithms, we'll concentrate on the software engineering principles crucial for developing reliable scientific software.
+
+Given a linear system `Ax = b`, numerous methods can find the solution `x`. We will implement and provide:
+
+1.  **Gauss-Jordan Elimination:** A versatile algorithm applicable to a wide range of matrices.
+2.  **Cholesky Decomposition:** A highly efficient specialized algorithm for symmetric positive-definite matrices.
+
+The emphasis of this workshop, however, is less on the intricate mathematical details of these algorithms and more on **how to build a well-structured codebase around them.** We aim to mirror the design of established scientific libraries by learning to:
+
+*   Offer users a choice of solution methods through configurable options (e.g., command-line flags).
+*   Incorporate effective error handling strategies to make our C programs more resilient and easier to debug (though segmentation faults remain a C programmer's rite of passage!).
+*   Organize larger projects using multiple source files for better modularity.
+*   Streamline compilation and linking with Makefiles for build automation.
+*   Leverage existing, highly optimized numerical libraries. Specifically, we'll explore how to interface with LAPACK, a foundational library that underpins much of the scientific software ecosystem, including on platforms like Gadi.
+
+To ensure everyone is on the same page, we'll start with a brief review of key C programming concepts that will be central to our exercises.
+
+# Refresher
 
 ## Pointers
 
@@ -111,7 +130,7 @@ argv:
 +-----------+
 ```
 
-To provide utilities based on user input, you can parse command-line arguments. The strcmp function (from <string.h>) is useful for comparing strings:
+To provide utilities based on user input, we can parse command-line arguments. The **`strcmp`** function (from <string.h>) is useful for comparing strings:
 
 ```c
 int strcmp ( const char * str1, const char * str2 );
@@ -213,6 +232,24 @@ else {
 }
 ```
 
+```c 
+int fprintf(FILE *stream, const char *format, ...);
+```
+
+- stream: A pointer to the FILE object that identifies the stream where the output is to be written. 
+
+- format: A string that specifies the format of the output. It may contain format specifiers that are replaced by the values specified in the subsequent arguments
+
+- The **`fprintf()`** function returns the number of characters written if successful, and a negative value if an error occurs. 
+
+> **E.g.**
+```c
+if (fprintf(out_fp, "%.8f\n", x[k]) < 0) {
+    fprintf(stderr, "Error writing element x[%d] to output file.\n", k);
+    break;
+    }
+```
+
 
 
 ```c
@@ -229,4 +266,3 @@ if (fp != NULL) {
     fclose(fp);
 }
 ```
-

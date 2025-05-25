@@ -316,6 +316,7 @@ int info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n_row, A_lapack_1d, n_row);
 
 
 ## Exercises
+
 1. 
   In **`linear-algebra-lapack.c`**, after performing Cholesky factorisation with **`LAPACKE_dpotrf`**, call **`LAPACKE_dpotrs`** to solve the system. Fill in all required arguments—matrix layout, triangle indicator, dimensions, pointers to U and the right-hand side. See the manual [here]( https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-1/potrs.html).
 
@@ -327,3 +328,13 @@ To use the library,
 module load intel-compiler-llvm/2025.0.4
 module load intel-mkl/2025.0.1
 ```
+
+# Compilation and Makefile
+We have written a few source codes with headers and source files, we even have had linking external mkl lapacke library for the use of their functions. 
+This means compiling and building is no longer a trivial task. 
+Thankfully, we have automation tools to make the process slightly easier. 
+The typical choice for C programming is makefile (however, you can use makefile to automate many other tasks beyond C.) with CMake being another popular tool for even more complex projects.
+
+Before going straight into the makefile nitty-gritty. 
+Let's walk through the process of compilation. 
+

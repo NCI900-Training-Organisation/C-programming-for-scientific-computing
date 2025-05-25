@@ -4,18 +4,18 @@ This workshop guides you through the process of writing robust linear algebra so
 
 Given a linear system `Ax = b`, numerous methods can find the solution `x`. We will implement and provide:
 
-1.  **Gauss-Jordan Elimination:** A versatile algorithm applicable to a wide range of matrices.
-2.  **Cholesky Decomposition:** A highly efficient specialized algorithm for symmetric positive-definite matrices.
+1.  **Gauss-Jordan Elimination:** A basic and generic algorithm applicable to all matrices.
+2.  **Cholesky Decomposition:** A highly efficient algorithm for symmetric positive-definite matrices.
 
 The emphasis of this workshop, however, is less on the intricate mathematical details of these algorithms and more on **how to build a well-structured codebase around them.** We aim to mirror the design of established scientific libraries by learning to:
 
-*   Offer users a choice of solution methods through configurable options (e.g., command-line flags).
-*   Incorporate effective error handling strategies to make our C programs more resilient and easier to debug (though segmentation faults remain a C programmer's rite of passage!).
-*   Organize larger projects using multiple source files for better modularity.
-*   Streamline compilation and linking with Makefiles for build automation.
-*   Leverage existing, highly optimized numerical libraries. Specifically, we'll explore how to interface with LAPACK, a foundational library that underpins much of the scientific software ecosystem, including on platforms like Gadi.
+*   Offer users choices of solution methods through configurable options (e.g., command-line flags).
+*   Learn effective error handling strategies to make our C programs more resilient and easier to debug (though segmentation faults remain a C programmer's rite of passage!).
+*   Organise larger projects using multiple source files for better modularity.
+*   Autemate compilation and linking with Makefiles for build.
+*   Port existing, highly optimised numerical libraries. Specifically, we'll explore how to interface with LAPACK on Gadi, a foundational library that underpins much of the scientific software ecosystem.
 
-To ensure everyone is on the same page, we'll start with a brief review of key C programming concepts that will be central to our exercises.
+We'll kick off with a focused C programming refresher, covering concepts essential for building these solvers.
 
 # Refresher
 

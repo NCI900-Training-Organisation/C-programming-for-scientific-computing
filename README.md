@@ -276,14 +276,14 @@ $ ./read_mat_file trefethen_dense.dat
 
 ## Exercises
 
-1. **Enhance Robustness**  
+1. 
    In `linear-algebra-GJ-filescope.c`, review the `gauss_jordan_partial` function and its invocation in `main`. Add any missing validation or error checks (e.g., null pointers, invalid return values etc) to make the program more resilient.
 
-2. **Implement Error Handling**  
+2.  
    Throughout `linear-algebra-GJ-filescope.c`, you’ll find TODO comments for error handling. Replace these placeholders with sensible logic: print informative messages, and exit if you decide so.
 
-3. **Refactor for Modularity**  
+3.  
    The file `linear-algebra-GJ-filescope.c` may seem a little unwieldy. Refactor it by splitting related functionality into separate source (`.c`) and header (`.h`) files — e.g., one for matrix operations, one for utilities — so that each component is easier to maintain.
 
-4. **Add a Cholesky Flag**  
+4.   
    In `linear-algebra-multisolvers.c`, add a new command-line option (for example, `--cholesky`) that lets users explicitly select the Cholesky solver when working with symmetric matrices. Update `main` and your argument-parsing logic accordingly.

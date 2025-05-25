@@ -274,19 +274,16 @@ $ ./read_mat_file trefethen_dense.dat
 
 
 
-> **Exercise:**
+## Exercises
 
-> In the file **`linear-algebra-GJ-filescope.c`**, take a look at the function **`gauss_jordan_partial`** and where it is called in **`main`**. Have you noticed something that could possibly be missing? Try to make the program more robust.
+1. **Enhance Robustness**  
+   In `linear-algebra-GJ-filescope.c`, review the `gauss_jordan_partial` function and its invocation in `main`. Add any missing validation or error checks (e.g., null pointers, invalid return values etc) to make the program more resilient.
 
+2. **Implement Error Handling**  
+   Throughout `linear-algebra-GJ-filescope.c`, you’ll find TODO comments for error handling. Replace these placeholders with sensible logic: print informative messages, and exit if you decide so.
 
-> **Exercise:**
+3. **Refactor for Modularity**  
+   The file `linear-algebra-GJ-filescope.c` may seem a little unwieldy. Refactor it by splitting related functionality into separate source (`.c`) and header (`.h`) files — e.g., one for matrix operations, one for utilities — so that each component is easier to maintain.
 
-> In the file **`linear-algebra-GJ-filescope.c`**, you will see many comments are left for error handling. Apply your own decision to handle them.
-
-> **Exercise**
-Now you should have improved the usability of the program, however, the codebase is **`linear-algebra-GJ-filescope.c`** is somewhat overloaded. Can you make it more organised by separate the codebase into smaller files depending on their functionalities?
-
-
-> **Exercise**
-In the file **`linear-algebra-multisolvers.c`**, we added the Cholesky solver into the program to specially handle matrices that are symmetric. 
-Can you add an extra user flag to handle this user option? 
+4. **Add a Cholesky Flag**  
+   In `linear-algebra-multisolvers.c`, add a new command-line option (for example, `--cholesky`) that lets users explicitly select the Cholesky solver when working with symmetric matrices. Update `main` and your argument-parsing logic accordingly.

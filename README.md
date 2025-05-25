@@ -274,12 +274,14 @@ $ ./read_mat_file trefethen_dense.dat
 
 
 
-> **Exercise**
+> **Exercise:**
+
 > In the file **`linear-algebra-GJ-filescope.c`**, take a look at the function **`gauss_jordan_partial`** and where it is called in **`main`**. Have you noticed something that could possibly be missing? Try to make the program more robust.
 
 
-> **Exercise**
-In the file **`linear-algebra-GJ-filescope.c`**, you will see many comments are left for error handling. Apply your own decision to handle them.
+> **Exercise:**
+
+> In the file **`linear-algebra-GJ-filescope.c`**, you will see many comments are left for error handling. Apply your own decision to handle them.
 
 > **Exercise**
 Now you should have improved the usability of the program, however, the codebase is **`linear-algebra-GJ-filescope.c`** is somewhat overloaded. Can you make it more organised by separate the codebase into smaller files depending on their functionalities?

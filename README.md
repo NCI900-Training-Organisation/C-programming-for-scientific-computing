@@ -5,7 +5,7 @@ This workshop guides you through the process of writing robust linear algebra so
 Given a linear system `Ax = b`, numerous methods can find the solution `x`. We will implement and provide:
 
 1.  **Gauss-Jordan Elimination:** A basic and generic algorithm applicable to all matrices.
-2.  **Cholesky Decomposition:** A highly efficient algorithm for symmetric matrices.
+2.  **Cholesky Decomposition:** A highly efficient algorithm for symmetric positive definite matrices.
 
 The emphasis of this workshop, however, is less on the intricate mathematical details of these algorithms and more on **how to build a well-structured codebase around them.** We aim to mirror the design of established scientific libraries by learning to:
 
@@ -287,3 +287,43 @@ $ ./read_mat_file trefethen_dense.dat
 
 4.   
    In `linear-algebra-multisolvers.c`, add a new command-line option (for example, `--cholesky`) that lets users explicitly select the Cholesky solver when working with symmetric matrices. Update `main` and your argument-parsing logic accordingly.
+
+
+# LAPACK
+Our program currently relies on custom matrix-solver primitives, but in practice you should always first seek existing, highly optimized libraries rather than reinvent the wheel. The **Linear Algebra PACKage (LAPACK)** is the standard for problems: it offers a wide range of efficient, well implemented algorithms for solving matrix equations and is used extensively in scientific software.
+
+If you need fast, reliable linear-algebra routines, LAPACK should be your first choice. 
+To demonstrate how to integrate it, we’ll add a new command-line flag (for example, `--lapack-cholesky`) that tells the program to use LAPACK’s Cholesky decomposition routine.
+
+We use two LAPACK functions: **`LAPACKE_dpotrf`** and **`LAPACKE_dpotrs`**. Their documentation can be found on the official [LAPACK website](https://www.netlib.org/lapack/explore-html/d1/dd3/group__potrf2_ga7a1158271be5fac6e3d89b7ca8d71a07.html#ga7a1158271be5fac6e3d89b7ca8d71a07) and [Intel oneAPI]( https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-1/potrf2.html).
+
+> **E.g.**
+```c
+int info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n_row, A_lapack_1d, n_row);
+```
+
+-  Specifies whether matrix storage layout is row major (LAPACK_ROW_MAJOR) or column major (LAPACK_COL_MAJOR).
+
+- 'U': Upper triangle of A is stored;
+
+- The order of the matrix A.
+
+- A pointer to the first element of the 1D array storing the matrix `A`. **This array will be overwritten**. 
+
+- The **upper triangular part** of `A` is supplied. The function computes `A = U^T * U`, and the upper triangular factor `U` overwrites the upper triangle of `A_lapack_1d`.
+
+- Return value: On success, info == 0; if info > 0, the leading minor of order info is not positive definite.
+
+
+## Exercises
+1. 
+  In **`linear-algebra-lapack.c`**, after performing Cholesky factorisation with **`LAPACKE_dpotrf`**, call **`LAPACKE_dpotrs`** to solve the system. Fill in all required arguments—matrix layout, triangle indicator, dimensions, pointers to U and the right-hand side. See the manual [here]( https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-1/potrs.html).
+
+
+
+On Gadi, LAPACK is shipped with intel-mkl.
+To use the library, 
+```bash
+module load intel-compiler-llvm/2025.0.4
+module load intel-mkl/2025.0.1
+```

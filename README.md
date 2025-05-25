@@ -275,7 +275,7 @@ $ ./read_mat_file trefethen_dense.dat
 
 
 > **Exercise**
-In the file **`linear-algebra-GJ-filescope.c`**, take a look at the function **`gauss_jordan_partial`** and where it is called in **`main`**. Have you noticed something that could possibly be missing? Try to make the program more robust.
+> In the file **`linear-algebra-GJ-filescope.c`**, take a look at the function **`gauss_jordan_partial`** and where it is called in **`main`**. Have you noticed something that could possibly be missing? Try to make the program more robust.
 
 
 > **Exercise**

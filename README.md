@@ -5,7 +5,7 @@ This workshop guides you through the process of writing robust linear algebra so
 Given a linear system `Ax = b`, numerous methods can find the solution `x`. We will implement and provide:
 
 1.  **Gauss-Jordan Elimination:** A basic and generic algorithm applicable to all matrices.
-2.  **Cholesky Decomposition:** A highly efficient algorithm for symmetric positive-definite matrices.
+2.  **Cholesky Decomposition:** A highly efficient algorithm for symmetric matrices.
 
 The emphasis of this workshop, however, is less on the intricate mathematical details of these algorithms and more on **how to build a well-structured codebase around them.** We aim to mirror the design of established scientific libraries by learning to:
 
@@ -15,7 +15,7 @@ The emphasis of this workshop, however, is less on the intricate mathematical de
 *   Autemate compilation and linking with Makefiles for build.
 *   Port existing, highly optimised numerical libraries. Specifically, we'll explore how to interface with LAPACK on Gadi, a foundational library that underpins much of the scientific software ecosystem.
 
-We'll kick off with a focused C programming refresher, covering concepts essential for building these solvers.
+We'll kick off with a focused C programming refresher, covering concepts that will be central to our exercises.
 
 # Refresher
 
@@ -250,8 +250,6 @@ if (fprintf(out_fp, "%.8f\n", x[k]) < 0) {
     }
 ```
 
-
-
 ```c
 int fclose(FILE *stream);
 ```
@@ -266,3 +264,27 @@ if (fp != NULL) {
     fclose(fp);
 }
 ```
+
+You can read through the file **`read_mat_file`** to see how those functions are used to read a matrix input file.
+
+```bash
+$ gcc read_mat_file.c -o read_mat_file
+$ ./read_mat_file trefethen_dense.dat
+```
+
+
+
+> **Exercise**
+In the file **`linear-algebra-GJ-filescope.c`**, take a look at the function **`gauss_jordan_partial`** and where it is called in **`main`**. Have you noticed something that could possibly be missing? Try to make the program more robust.
+
+
+> **Exercise**
+In the file **`linear-algebra-GJ-filescope.c`**, you will see many comments are left for error handling. Apply your own decision to handle them.
+
+> **Exercise**
+Now you should have improved the usability of the program, however, the codebase is **`linear-algebra-GJ-filescope.c`** is somewhat overloaded. Can you make it more organised by separate the codebase into smaller files depending on their functionalities?
+
+
+> **Exercise**
+In the file **`linear-algebra-multisolvers.c`**, we added the Cholesky solver into the program to specially handle matrices that are symmetric. 
+Can you add an extra user flag to handle this user option? 

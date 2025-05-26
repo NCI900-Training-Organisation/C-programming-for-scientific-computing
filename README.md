@@ -329,14 +329,11 @@ module load intel-mkl/2025.0.1
 ```
 
 # Compilation and Makefile
-We have written a few source codes with headers and source files, we even have had linking external mkl lapacke library for the use of their functions. 
-This means compiling and building is no longer a trivial task. 
-Thankfully, we have automation tools to make the process slightly easier. 
-The typical choice for C programming is makefile (however, you can use makefile to automate many other tasks beyond C.) with CMake being another popular tool for even more complex projects.
+As our projects grow to include multiple source files, header files, and external libraries like MKL LAPACKE, manually compiling is no longer a one-liner (maybe a very long one-line) and linking becomes tedious and error-prone. Fortunately, automation tools streamline this process.
 
-Before going straight into the makefile nitty-gritty. 
-Let's walk through the process of compilation.
-Building an executable program from a C source code takes a few stages, listed below in chornical order:
+For C programming, the traditional and highly effective tool is **`make`** (using a **Makefile**). While `make` is versatile enough for many automation tasks beyond C, its primary use in C/C++ is managing the build process. For very large or cross-platform projects, tools like **CMake** offer even more advanced capabilities.
+
+Before jumping into Makefile syntax, let’s review the C build pipeline. Converting your `.c` sources into an executable involves four main stages, in chronological order:
 
 - Preprocessing: It processes the source code before actual compilation by expanding all **`#include`** macros **`#define`**. The output is still a C code with suffix .i.
 
@@ -363,5 +360,5 @@ gcc -c linear-algebra-GJ-filescope.s -o linear-algebra-GJ-filescope.o
 - Linking: 
 > **E.g.**
 ```bash
-gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope
+gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope -lm
 ```

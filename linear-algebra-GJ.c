@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     input_filename = argv[1]; // get filename from the command line
 
 
-    // --- allocate memory for matrices an vectors  ---
+    //  allocate memory for matrices an vectors  
     A = matrix(MAX_SIZE, MAX_SIZE);
     b = vector(MAX_SIZE);
     x = vector(MAX_SIZE);
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     if ((fp = fopen(input_filename, "r")) == NULL) { /* Todo: Handle error */ nrerror("..."); }
     printf("Successfully opened file.\n");
 
-    // --- consume initial header ---
+    // consume initial header 
     if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
     if (fgets(buffer, MAXSTR, fp) == NULL) { /* Todo: Handle error */ }
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     printf("\nStarting to read systems from file...\n");
     if(fscanf(fp, "%d %d", &n_row, &m_col) != 2){}
 
-// --- validation and header consumption for A and b ---
+//  validation and header consumption for A and b 
     if (n_row <= 0 || n_row > MAX_SIZE) { /* Todo: Handle validation*/ }
     if (m_col != 1) { /* Todo: handle validation */ }
     fgets(buffer, MAXSTR, fp); // consume rest of N M line
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     print_vector(b,  n_row, "Original b");
 
 
-    // --- solve using selected method ---
+    //  solve using selected method 
     int solve_success = 1;
     // GAUSS_JORDAN
     printf("\nAttempting Gauss-Jordan Elimination...\n");
@@ -92,37 +92,75 @@ int main(int argc, char *argv[])
     }
 
     print_matrix(Aug, n_row,  n_row + 1, "initial Augmented [A|b]");
-    gauss_jordan_partial(Aug, n_row); // Modifies Aug, might exit
+    gauss_jordan_partial(Aug, n_row); // modifies Aug, might exit
     printf("Gauss-Jordan complete.\n");
     print_matrix(Aug, n_row, n_row + 1, "Final Augmented [I|x]");
     for (k = 0; k < n_row; k++)  x[k] = Aug[k][n_row]; 
 
 
-    // --- print and verify solution ---
     if (solve_success) {
-        print_vector(x, n_row, "Solution x");
+        print_vector(x, n_row, "Solution x"); 
+    
+        //  write solution to a file 
+        FILE *out_fp = NULL;
+        char output_filename[MAXSTR + 20]; // +20 for suffix and null terminator
+    
+        if (input_filename != NULL) { // again we check the file exists
+            snprintf(output_filename, sizeof(output_filename), "%s_solution.txt", input_filename);
+        } 
+        else {
+            snprintf(output_filename, sizeof(output_filename), "solution_output.txt");
+        }
+    
+        printf("Attempting to write solution to: %s\n", output_filename);
+        out_fp = fopen(output_filename, "w"); 
+    
+        if (out_fp == NULL) {
+            fprintf(stderr, "Error: Could not open output file '%s' for writing solution.\n", output_filename);
+        } 
+        else {
+            // since we didn't stop on input_filename error, we are defensively checking
+            fprintf(out_fp, "# Solution vector x for input: %s\n", (input_filename ? input_filename : "N/A"));
+            fprintf(out_fp, "# Number of elements (N_ROW): %d\n", n_row);
+            for (k = 0; k < n_row; k++) {
+                if (fprintf(out_fp, "%.8f\n", x[k]) < 0) {
+                    fprintf(stderr, "Error writing element x[%d] to output file.\n", k);
+                    break;
+                }
+            }
+            fclose(out_fp); 
+            printf("Solution successfully written to %s.\n", output_filename);
+        }
+        // end of writing solution to file 
+    
         printf("Verifying solution (Calculating A * x)...\n");
+
         for (k = 0; k < n_row; k++) {
             check[k] = 0.0;
-            for (j = 0; j < n_row; j++) { check[k] += A[k][j] * x[j]; }
+            for (j = 0; j < n_row; j++) {
+                check[k] += A[k][j] * x[j]; 
+            }
         }
-        print_vector(check,  n_row, "Calculated A*x");
+        print_vector(check, n_row, "Calculated A*x");
         printf("Comparing A*x with original b:\n");
-        
+    
         int errors = 0;
         for (k = 0; k < n_row; k++) {
             if (fabs(check[k] - b[k]) > TOL) {
-                printf("  Mismatch at index [%d]: ...\n", k); errors++;
+                printf("  Mismatch at index [%d]: A*x = %.7g, b = %.7g, Diff = %.7g\n",
+                       k, check[k], b[k], fabs(check[k] - b[k]));
+                errors++;
             }
         }
-        if (errors == 0) { printf("  Verification successful...\n"); }
-        else { printf("  Verification FAILED...\n"); }
-
+        if (errors == 0) {
+            printf("  Verification successful (within TOL=%.1e).\n", TOL);
+        } else {
+            printf("  Verification FAILED (%d mismatches).\n", errors);
+        }
+    
     } else {
-            printf("\nSkipping verification for this system due to solver incompatibility or failure.\n");
+        printf("\nSkipping verification and solution output for this system due to solver incompatibility or failure.\n");
     }
-
-    printf("\n------------------------------------\n\n"); // separator
 
     /* check if the file has been consumed completely. */
     if (!feof(fp)) {
@@ -132,7 +170,7 @@ int main(int argc, char *argv[])
     fclose(fp);
     printf("File processing complete for %s.\n", input_filename);
 
-    // --- Free Memory ---
+    //  free Memory 
     printf("Freeing memory...\n");
     free_matrix(A);
     free_vector(b);

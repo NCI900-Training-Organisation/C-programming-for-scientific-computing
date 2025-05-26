@@ -15,9 +15,7 @@
 typedef enum { GAUSS_JORDAN, CHOLESKY } SolverMethod;
 
 
-
-
-// --- Main function modified ---
+//  Main function modified 
 int main(int argc, char *argv[])
 {
 
@@ -30,22 +28,23 @@ int main(int argc, char *argv[])
     char *input_filename = NULL;
     SolverMethod method = GAUSS_JORDAN;
 
-    // --- parse command line Arguments ---
+    //  parse command line Arguments 
      if (argc < 2) { /* usage */ exit(EXIT_FAILURE); }
 
-     // Check for optional flag -g or -c
+     // check for optional flag -g or -c
      if (argc > 2 && (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-g") == 0)) {
          if (strcmp(argv[1], "-c") == 0) method = CHOLESKY;
          else method = GAUSS_JORDAN;
          input_filename = argv[2];
          if (argc > 3) fprintf(stderr, "Warning: Extra arguments ignored.\n");
-     } else {
+     } 
+     else {
          input_filename = argv[1]; 
          if (argc > 2) fprintf(stderr, "Warning: Treating '%s' as filename. Use -g or -c flag.\n", argv[1]);
      }
 
 
-    // --- allocate memory for matrices vectors  ---
+    //  allocate memory for matrices vectors  
     A = matrix(MAX_SIZE,  MAX_SIZE);
     b = vector(MAX_SIZE);
     x = vector(MAX_SIZE);
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
     A_chol = matrix(MAX_SIZE, MAX_SIZE);
     check = vector(MAX_SIZE);
 
-    // --- open the specified input file ---
+    //  open the specified input file 
     printf("Input file: %s\n", input_filename);
     printf("Using solver: %s\n", (method == CHOLESKY) ? "Cholesky" : "Gauss-Jordan");
     if ((fp = fopen(input_filename, "r")) == NULL) { /* error */ nrerror("..."); }
@@ -68,7 +67,7 @@ int main(int argc, char *argv[])
     printf("\nStarting to read systems from file...\n");
     if(fscanf(fp, "%d %d", &n_row, &m_col) != 2) {}
 
-    // --- validation and header consumption for A and b ---
+    //  validation and header consumption for A and b 
     if (n_row <= 0 || n_row > MAX_SIZE) { /* Todo: Handle validation */ }
     if (m_col != 1) { /* Todo: handle validation */ }
     fgets(buffer, MAXSTR, fp); // consume rest of N M line
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
     print_vector(b,  n_row, "Original b");
 
 
-    // --- solve using selected method ---
+    // solve using selected method 
     int solve_success = 1;
     if (method == CHOLESKY) {
         printf("\nAttempting Cholesky Decomposition...\n");
@@ -124,7 +123,7 @@ int main(int argc, char *argv[])
             for (k = 0; k < n_row; k++) { x[k] = Aug[k][n_row]; }
     }
 
-    // ---  verify solution ---
+    //   verify solution 
     if (solve_success) {
             print_vector(x,  n_row, "Solution x");
             printf("Verifying solution (Calculating A * x)...\n");
@@ -159,7 +158,7 @@ int main(int argc, char *argv[])
     fclose(fp);
     printf("File processing complete for %s.\n", input_filename);
 
-    // --- Free Memory ---
+    //  Free Memory 
     printf("Freeing memory...\n");
     free_matrix(A);
     free_vector(b);

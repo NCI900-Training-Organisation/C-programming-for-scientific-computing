@@ -435,6 +435,9 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
+# Compilation step:  build each .o from its corresponding .c
+#  $< is the first dependency (the .c file)
+#  $@ is the target (the .o file)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -444,6 +447,8 @@ clean:
 
 ## Exercises
 
-1. Go to **`Makefile`**, add a target for building **`linear-algebra-lapack`**.
+1. Go to **`Makefile`**, and add a new target called `solver` for `linear-algebra-lapack.c` with its dependencies and rules. 
+
+
 
 

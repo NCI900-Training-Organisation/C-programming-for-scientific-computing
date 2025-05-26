@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 
-/* fgets */
 /* we want to read the matrix file it requires:
    1. open the file,
    2. skip the header
@@ -63,13 +62,14 @@ int main(int argc, char *argv[]){
 
 
 
-    /* read the matrix */
+    /* allocate memory for  the matrix */
     float **A = (float **)malloc((size_t)n * sizeof(float *));
     float *A_data = (float *)malloc((size_t)n * n * sizeof(float));
     for (int i = 0; i < n; i++){
         A[i] = A_data + (size_t) i * n; //link the data to the matrix
     }
 
+    /* read and initialise the matrix */
     for (int i = 0; i <n; i++){
         for (int j = 0; j < n; j++){
             fscanf(fp, "%f", &A[i][j]);

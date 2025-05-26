@@ -16,7 +16,7 @@
 #define TOL_DOUBLE 1.0e-9 // Tolerance for double comparisons
 
 // define solver method
-typedef enum { GAUSS_JORDAN, CHOLESKY_CUSTOM, CHOLESKY_LAPACK } SolverMethod;
+typedef enum { GAUSS_JORDAN, CHOLESKY_PRIMITIVE, CHOLESKY_LAPACK } SolverMethod;
 
 
 
@@ -27,8 +27,7 @@ int main(int argc, char *argv[])
     int j, k, l;
     int n_row, m_col;
 
-    // === Data Structures (Mixed Precision) ===
-    // Read input into double precision structures
+    // read input into double precision structures
     double **A; 
     double *b;
     double *x;
@@ -43,17 +42,17 @@ int main(int argc, char *argv[])
 
     float **Aug; 
 
-    // Temporary 1D arrays for LAPACK (contiguous memory)
+    // temporary 1D arrays for LAPACK (contiguous memory)
     double *A_lapack_1d; 
     double *b_lapack_1d; 
 
     char buffer[MAXSTR];
     FILE *fp;
     char *input_filename = NULL;
-    SolverMethod method = GAUSS_JORDAN; // Default method
+    SolverMethod method = GAUSS_JORDAN; // default method
     lapack_int info; // LAPACK return code
 
-    // --- Parse Command-Line Arguments ---
+    // --- parse command line arguments ---
     if (argc < 2) {
         fprintf(stderr, "Usage: %s [-g | -c | -cl] <matrix_data_file>\n", argv[0]);
         fprintf(stderr, "  -g : Use Gauss-Jordan (float)\n");
@@ -62,10 +61,10 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // Check for optional flag
-    if (argc > 2 && (argv[1][0] == '-' && (argv[1][1] == 'g' || argv[1][1] == 'c'))) {
+    // check for optional flag
+    if (argc > 2  && (argv[1][1] == 'g' || argv[1][1] == 'c')) {
         if (strcmp(argv[1], "-c") == 0) {
-            method = CHOLESKY_CUSTOM;
+            method = CHOLESKY_PRIMITIVE;
         } else if (strcmp(argv[1], "-cl") == 0) {
             method = CHOLESKY_LAPACK;
         } else if (strcmp(argv[1], "-g") == 0) {
@@ -75,7 +74,7 @@ int main(int argc, char *argv[])
              input_filename = argv[1];
               fprintf(stderr, "Warning: Unrecognized flag '%s'. Defaulting to Gauss-Jordan.\n", argv[1]);
               method = GAUSS_JORDAN;
-              if(argc > 2) input_filename = argv[2]; // Assume filename is next if flag was invalid
+              if(argc > 2) input_filename = argv[2]; 
                else { fprintf(stderr,"Error: Missing filename after potentially invalid flag.\n"); exit(EXIT_FAILURE);}
 
         }
@@ -90,11 +89,11 @@ int main(int argc, char *argv[])
     }
 
 
-    // --- allocate Primary Double Precision Structures ---
+    // --- allocate memory for matrices and vectors ---
     A = dmatrix(MAX_SIZE,  MAX_SIZE);
     b = dvector(MAX_SIZE);
-    x = dvector(MAX_SIZE);        // Solution always stored as double
-    check = dvector(MAX_SIZE);    // Verification always uses double
+    x = dvector(MAX_SIZE);        
+    check = dvector(MAX_SIZE);    
 
 
     // --- open the specified input file ---
@@ -102,24 +101,24 @@ int main(int argc, char *argv[])
     const char* method_str = "Unknown";
     switch(method) {
         case GAUSS_JORDAN: method_str = "Gauss-Jordan (Float)"; break;
-        case CHOLESKY_CUSTOM: method_str = "Cholesky (Custom Float)"; break;
+        case CHOLESKY_PRIMITIVE: method_str = "Cholesky (Custom Float)"; break;
         case CHOLESKY_LAPACK: method_str = "Cholesky (LAPACK Double)"; break;
     }
     printf("Using solver: %s\n", method_str);
     if ((fp = fopen(input_filename, "r")) == NULL) { nrerror("File open error"); }
     printf("Successfully opened file.\n");
 
-    // --- consume initial header lines ---
+    //consume initial header lines 
     printf("Skipping initial header lines...\n");
     if (fgets(buffer, MAXSTR, fp) == NULL) { nrerror("Error reading first header or empty file."); }
     if (fgets(buffer, MAXSTR, fp) == NULL) { nrerror("Error reading second header or file too short."); }
 
-    // --- read dimensions N M ---
+    //  read dimensions N M 
     if (fscanf(fp, " %d %d", &n_row, &m_col) != 2) {
         nrerror("Error reading matrix dimensions (N M) for the first system.");
     }
 
-    // --- validation ---
+    //  validation 
     if (n_row <= 0 || n_row > MAX_SIZE) {
         fprintf(stderr, "Error: Invalid dimension N=%d (Max N=%d).\n", n_row, MAX_SIZE);
         fclose(fp); // Close file before exiting
@@ -129,11 +128,11 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Warning: File specifies M=%d, but expecting M=1 for Ax=b. Proceeding anyway.\n", m_col);
     }
 
-    // --- consume headers/lines before A ---
-    fgets(buffer, MAXSTR, fp); // Consume rest of N M line
-    fgets(buffer, MAXSTR, fp); // Consume header before A
+    // consume headers/lines before A 
+    fgets(buffer, MAXSTR, fp); // consume rest of N M line
+    fgets(buffer, MAXSTR, fp); // consume header before A
 
-    // --- read Matrix A (into double) ---
+    //  read Matrix A (into double) 
     printf("Reading Matrix A (%d x %d) as double:\n", n_row, n_row);
     for (k = 0; k < n_row; k++) {
         for (l = 0; l < n_row; l++) {
@@ -141,7 +140,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    // --- consume headers/lines before b ---
+    //  consume headers/lines before b 
     fgets(buffer, MAXSTR, fp); // consume line after A data
     fgets(buffer, MAXSTR, fp); // consume header before b
 
@@ -169,7 +168,7 @@ int main(int argc, char *argv[])
         if (!is_symmetric_double(A_chol_lapack, n_row)) {
             fprintf(stderr, "ERROR: Matrix A is not symmetric. Cholesky method cannot be used.\n");
             solve_success = 0;
-            // Free memory allocated ONLY for this block if failing early
+            // free memory allocated ONLY for this block if failing early
             free_dmatrix(A_chol_lapack); A_chol_lapack = NULL;
         } else {
             printf("Matrix appears symmetric. Proceeding with LAPACK.\n");
@@ -178,16 +177,16 @@ int main(int argc, char *argv[])
             b_lapack_1d = (double*)malloc(n_row * sizeof(double));
             if (!A_lapack_1d || !b_lapack_1d) nrerror("Memory allocation failed for LAPACK arrays");
 
-            // Copy to 1D arrays
+            // copy to 1D arrays
             for (k = 0; k < n_row; k++) for (l = 0; l < n_row; l++) A_lapack_1d[k  * n_row + l ] = A_chol_lapack[k][l];
             for (k = 0; k < n_row; k++) b_lapack_1d[k] = b[k];
 
-            // Call LAPACKE_dpotrf
+            // call LAPACKE_dpotrf, which factorises A = U^T * U
             info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n_row, A_lapack_1d, n_row);
             if (info != 0) { /* error handling */ solve_success = 0; }
             else {
-                // Call LAPACKE_dpotrs
-                info = LAPACKE_dpotrs(LAPACK_ROW_MAJOR, 'U', n_row, 1, A_lapack_1d, n_row, b_lapack_1d, 1);
+                // call LAPACKE_dpotrs, which solves Ax =b given A = U^T * U.
+                info = LAPACKE_dpotrs(/* TODO: fill in the arguments */);
                 if (info != 0) { /* error handling */ solve_success = 0; }
                 else { /* copy solution */ for (k = 0; k < n_row; k++) x[k] = b_lapack_1d[k]; }
             }
@@ -197,30 +196,32 @@ int main(int argc, char *argv[])
             free_dmatrix(A_chol_lapack); A_chol_lapack = NULL;
         }
 
-    } else if (method == CHOLESKY_CUSTOM) {
+    } 
+    else if (method == CHOLESKY_PRIMITIVE) {
 
         A_chol_primitive = matrix(n_row,  n_row);
         b_primitive = vector(n_row);
         x_primitive = vector(n_row);
 
         // copy double input to float structures
-        for(k=0; k<n_row; ++k) b_custom[k] = (float)b[k];
-        for(k=0; k<n_row; ++k) for(l=0; l<n_row; ++l) A_chol_custom[k][l] = (float)A[k][l];
+        for(k=0; k<n_row; ++k) b_primitive[k] = (float)b[k];
+        for(k=0; k<n_row; ++k) for(l=0; l<n_row; ++l) A_chol_primitive[k][l] = (float)A[k][l];
 
         printf("\nAttempting Custom Cholesky Decomposition (Float)...\n");
         if (!is_symmetric(A_chol_primitive, n_row)) { 
             fprintf(stderr, "ERROR: Matrix A is not symmetric...\n");
             solve_success = 0;
-            // Free memory allocated ONLY for this block if failing early
+            // free memory allocated ONLY for this block if failing early
             free_matrix(A_chol_primitive); A_chol_primitive = NULL;
             free_vector(b_primitive); b_primitive = NULL; 
             free_vector(x_primitive); x_primitive= NULL; 
-        } else {
+        } 
+        else {
             printf("Matrix appears symmetric. Proceeding...\n");
             cholesky(A_chol_primitive, n_row);
             // print_nr_matrix(a_chol_custom, 1, n, 1, n, "Decomposed A (Float)");
             cholesky_solve(A_chol_primitive, b_primitive, x_primitive, n_row);
-            for(k=0; k<n_row; ++k) x[k] = (double)x_custom[k]; // copy solution to double x
+            for(k=0; k<n_row; ++k) x[k] = (double)x_primitive[k]; // copy solution to double x
 
             // Free memory after successful use
             free_matrix(A_chol_primitive); A_chol_primitive = NULL;
@@ -253,7 +254,7 @@ int main(int argc, char *argv[])
          free_matrix(Aug); Aug = NULL;
     } // end of solver methods
 
-    // --- print and verify solution ---
+    //  print and verify solution
     if (solve_success) {
          //print_nr_dvector(x, 1, n, "Solution x (Double)"); 
          printf("Verifying solution (Calculating A * x)...\n");

@@ -335,7 +335,11 @@ For C programming, the traditional and highly effective tool is **`make`** (usin
 
 Before jumping into Makefile syntax, let’s review the C build pipeline. Converting your `.c` sources into an executable involves four main stages, in chronological order:
 
-- Preprocessing: It processes the source code before actual compilation by expanding all **`#include`** macros **`#define`**. The output is still a C code with suffix .i.
+1. **Preprocessing (`.c` → `.i`):**
+    The first step involves the C preprocessor. It reads your source code and:
+    *   Processes directives starting with `#`, such as expanding `#define` macros.
+    *   Replaces `#include` directives with the content of the specified header files.
+    The result is an expanded C source file (often with a `.i` suffix).
 
 > **E.g.**
 ```bash

@@ -29,14 +29,11 @@ int main(int argc, char *argv[])
     SolverMethod method = GAUSS_JORDAN;
 
     //  parse command line Arguments 
-     if (argc < 2) { /* usage */ exit(EXIT_FAILURE); }
+     if (argc < 2) { /* TODO: Usage */ exit(EXIT_FAILURE); }
 
      // check for optional flag -g or -c
      if (argc > 2 && (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-g") == 0)) {
-         if (strcmp(argv[1], "-c") == 0) method = CHOLESKY;
-         else method = GAUSS_JORDAN;
-         input_filename = argv[2];
-         if (argc > 3) fprintf(stderr, "Warning: Extra arguments ignored.\n");
+        /* TODO: parse command-line argument options*/
      } 
      else {
          input_filename = argv[1]; 

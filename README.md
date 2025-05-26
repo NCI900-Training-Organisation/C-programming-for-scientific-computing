@@ -379,12 +379,12 @@ gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope -lm
 2. Compiling **`linear-algebra-lapack.c`** is likely to be more tricky given the external library linking. Try it yourself.
 
 
-If you agree with my statement in the above exercise, you might need a makefile to help you.
-Another significant advantage is the make system uses the data and time stamp of the file to deterine when files are out of date (changed), so when the progrom is recompiled, it only recompile the changed source codes.
+If you agree with my statement in the above exercise, you might need a `Makefile` to help you.
+Another significant advantage is that the make system uses the data and time stamp of the file to determine when files are out of date (changed), so when the program is recompiled, it only recompile the changed source codes.
 
-In makefile, we define targets, dependencies and commands to build our project. The basic structure of Makefile includes:
+In `Makefile`, we define targets, dependencies and commands to build our project. The basic structure of Makefile includes:
 
-- **file name**: usually is `makefile`.
+- **file name**: usually is `Makefile`.
 
 - **special variables**: Makefile has special variables like `CC` (compiler), `CFLAGS` (compiler flags), and `LDFLAGS` (linker flags) that can be used to customise the build process.
 
@@ -395,40 +395,55 @@ In makefile, we define targets, dependencies and commands to build our project. 
 
 > **E.g.**
 ```bash
-gcc -Wall -Wextra -g  -L/opt/intel/oneapi/mkl/latest/lib -Wl,-rpath=/opt/intel/oneapi/mkl/latest/lib linear-algebra-lapack-sln.o util.o primitives.o -o solver -lmkl_rt  -lm
+gcc -Wall -Wextra -g \
+    -I. \
+    -I/opt/intel/oneapi/mkl/latest/include \
+    -L/opt/intel/oneapi/mkl/latest/lib \
+    -Wl,-rpath=/opt/intel/oneapi/mkl/latest/lib \
+    linear-algebra-lapack-sln.c util.c primitives.c \
+    -o solver -lmkl_rt -lm
+
 ```
 
-can be written into a makefile like:
+The command line can be written into a `Makefile` like:
 
 ```makefile
-# Simple Makefile for building the 'solver' executable
-
 # Compiler and flags
 CC       = gcc
-CFLAGS   = -Wall -Wextra -g
+CFLAGS   = -Wall -Wextra -g \
+           -I. \
+           -I/opt/intel/oneapi/mkl/latest/include
 
-# Intel MKL library paths
-MKL_LIB  = -L/opt/intel/oneapi/mkl/latest/lib \
+# intel mkl lib path
+LDFLAGS  = -L/opt/intel/oneapi/mkl/latest/lib \
            -Wl,-rpath=/opt/intel/oneapi/mkl/latest/lib
 
-# Libraries to link
+# linking path
 LDLIBS   = -lmkl_rt -lm
 
-# Object files
-OBJS     = linear-algebra-lapack-sln.o util.o primitives.o
+# source files
+SRCS     = linear-algebra-lapack.c util.c primitives.c
 
-# Default target
-all: solver
+# auto generating objective files
+OBJS     = $(SRCS:.c=.o)
+TARGET   = solver
 
-# Link the executable
-solver: $(OBJS)
-	$(CC) $(CFLAGS) $(MKL_LIB) $^ -o $@ $(LDLIBS)
+# default target all
+all: $(TARGET)
 
-# Compile .c files into .o
+# rule to build
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean up build artifacts
 clean:
-	rm -f $(OBJS) solver
+	rm -f $(OBJS) $(TARGET)
 ```
+
+## Exercises
+
+1. Go to **`Makefile`**, add a target for building **`linear-algebra-lapack`**.
+
+

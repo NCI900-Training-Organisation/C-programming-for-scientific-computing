@@ -6,10 +6,10 @@ MKL_INCLUDE_PATH = /opt/intel/oneapi/mkl/latest/include
 MKL_LIB_PATH = /opt/intel/oneapi/mkl/latest/lib
 
 # --- Flags ---
-# include dirctories for preprocessor (needed for MKL)
-CPPFLAGS = -I. -I$(MKL_INCLUDE_PATH)
 # Standard compiler flags used by all compilations
 CFLAGS = -Wall -Wextra -g 
+
+MKLFLAGS   = -I. -I$(MKL_INCLUDE_PATH)
 
 # dybnamic linking during runtime
 LDFLAGS_MKL = -L$(MKL_LIB_PATH) -Wl,-rpath=$(MKL_LIB_PATH)
@@ -19,75 +19,67 @@ MKL_LIBS = -lmkl_rt #lapack uses multithreaded MKL
 
 # --- Source Files ---
 # Main program sources
-SRC_MAIN = linear-algebra-lapack.c   # The new multi-solver using MKL
-SRC_GJ = linear-algebra-GJ.c      # Original GJ solver
-SRC_BASE = linear-algebra-multisolver.c         # Original "base" solver
+SRC_MAIN = linear-algebra-lapack-sln.c   
+SRC_GJ = linear-algebra-GJ.c      
+SRC_MULTI = linear-algebra-multisolver.c
 
+# dependencies
+SRC_UTIL = util.c             
+SRC_PRIMITIVES = primitives.c                   
 
-# Common utility/solver sources
-SRC_NA_UTIL = util.c             # Utility functions (used by all)
-SRC_NA_OLD = primitives.c                   # Old NA functions (used by original solvers)
-#SRC_NA_NEW = na_solvers.c           # New NA functions (used by main multi-solver)
-
-# --- Object Files ---
+# --- object files ---
 OBJS_MAIN = $(SRC_MAIN:.c=.o)
 OBJS_GJ = $(SRC_GJ:.c=.o)
-OBJS_BASE = $(SRC_BASE:.c=.o)
+OBJS_MULTI = $(SRC_MULTI:.c=.o)
 
 
-OBJS_NA_UTIL = $(SRC_NA_UTIL:.c=.o)
-OBJS_NA_OLD = $(SRC_NA_OLD:.c=.o)
-#OBJS_NA_NEW = $(SRC_NA_NEW:.c=.o)
+OBJS_UTIL = $(SRC_UTIL:.c=.o)
+OBJS_PRIMITIVES = $(SRC_PRIMITIVES:.c=.o)
 
-# Group common objects for convenience
-OBJS_COMMON_OLD = $(OBJS_NA_UTIL) $(OBJS_NA_OLD)
-#OBJS_COMMON_NEW = $(OBJS_NA_UTIL) $(OBJS_NA_NEW)
+# group common objects for convenience
+OBJS_COMMON = $(OBJS_UTIL) $(OBJS_PRIMITIVES)
 
 # --- Executable Names ---
-TARGET_MAIN = solver            # Main multi-solver executable
-TARGET_GJ = solver_gj         # Original GJ executable
-TARGET_BASE = solver_multisolver      # Original base executable
+TARGET_MAIN = solver            
+TARGET_GJ = solver_gj         
+TARGET_MULTI = solver_multi      
 
 
 # --- Targets ---
 
-# Default Target: Build all executables
-all: $(TARGET_MAIN) $(TARGET_GJ) $(TARGET_BASE) 
+# default Target: Build all executables
+all: $(TARGET_MAIN) $(TARGET_GJ) $(TARGET_MULTI) 
 
-# Rule to build the main multi-solver executable (with MKL)
-$(TARGET_MAIN): $(OBJS_MAIN) $(OBJS_COMMON_OLD)
+# rule to build the main multi-solver executable, including lapack
+# TODO: ADD Rule to build the linear-algebra-lapack executable, linking with MKL
+$(TARGET_MAIN): $(OBJS_MAIN) $(OBJS_COMMON)
 	@echo "Linking $@ (with MKL)..."
 	$(CC) $(CFLAGS) $(LDFLAGS_MKL) $^ -o $@ $(MKL_LIBS) $(LDLIBS)
 	@echo "Built $@ successfully."
 
-# Rule to build the original GJ solver (NO MKL)
-$(TARGET_GJ): $(OBJS_GJ) $(OBJS_COMMON_OLD)
+
+# rule to build the original GJ solver 
+$(TARGET_GJ): $(OBJS_GJ) $(OBJS_COMMON)
 	@echo "Linking $@..."
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS)  $^ -o $@ $(LDLIBS)
 	@echo "Built $@ successfully."
 
-# Rule to build the original base solver (NO MKL)
-$(TARGET_BASE): $(OBJS_BASE) $(OBJS_COMMON_OLD)
+# rule to build the multisolver
+$(TARGET_MULTI): $(OBJS_MULTI) $(OBJS_COMMON)
 	@echo "Linking $@..."
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ $(LDLIBS)
+	$(CC) $(CFLAGS)  $^ -o $@ $(LDLIBS)
 	@echo "Built $@ successfully."
 
 
-# Generic rule to compile any .c file into a .o file
-# Uses CPPFLAGS (for includes) and CFLAGS (for compilation options)
+# generic rule to compile all .c file into a .o file
 %.o: %.c
 	@echo "Compiling $<..."
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(MKLFLAGS) $(CFLAGS) -c $< -o $@
 
-# --- Add explicit header dependencies if needed ---
-# Example: If na_solvers.c includes na_util.h, etc.
-# $(OBJS_NA_NEW): na_util.h na_solvers.h
-# $(OBJS_NA_OLD): na_util.h na.h
-# $(OBJS_NA_UTIL): na_util.h
 
 # --- Cleanup ---
 clean:
 	@echo "Cleaning up..."
-	rm -f $(TARGET_MAIN) $(TARGET_GJ) $(TARGET_BASE) \
-	      $(OBJS_MAIN) $(OBJS_GJ) $(OBJS_BASE)  \
-	      $(OBJS_NA_UTIL) $(OBJS_NA_OLD) \
+	rm -f $(TARGET_MAIN) $(TARGET_GJ) $(TARGET_MULTI) \
+	      $(OBJS_MAIN) $(OBJS_GJ) $(OBJS_MULTI)  \
+	      $(OBJS_UTIL) $(OBJS_PRIMITIVES) \

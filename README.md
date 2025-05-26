@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 
 
 
-## File process
+## I/O
 
 The following C standard library functions (from <stdio.h>) are commonly used for file input/output:
 
@@ -317,8 +317,7 @@ int info = LAPACKE_dpotrf(LAPACK_ROW_MAJOR, 'U', n_row, A_lapack_1d, n_row);
 
 ## Exercises
 
-1. 
-  In **`linear-algebra-lapack.c`**, after performing Cholesky factorisation with **`LAPACKE_dpotrf`**, call **`LAPACKE_dpotrs`** to solve the system. Fill in all required arguments—matrix layout, triangle indicator, dimensions, pointers to U and the right-hand side. See the manual [here]( https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-1/potrs.html).
+1. In **`linear-algebra-lapack.c`**, after performing Cholesky factorisation with **`LAPACKE_dpotrf`**, call **`LAPACKE_dpotrs`** to solve the system. Fill in all required arguments—matrix layout, triangle indicator, dimensions, pointers to U and the right-hand side. See the manual [here]( https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-1/potrs.html).
 
 
 
@@ -336,5 +335,33 @@ Thankfully, we have automation tools to make the process slightly easier.
 The typical choice for C programming is makefile (however, you can use makefile to automate many other tasks beyond C.) with CMake being another popular tool for even more complex projects.
 
 Before going straight into the makefile nitty-gritty. 
-Let's walk through the process of compilation. 
+Let's walk through the process of compilation.
+Building an executable program from a C source code takes a few stages, listed below in chornical order:
 
+- Preprocessing: It processes the source code before actual compilation by expanding all **`#include`** macros **`#define`**. The output is still a C code with suffix .i.
+
+> **E.g.**
+```bash
+gcc -E linear-algebra-GJ-filescope.c -o linear-algebra-GJ-filescope.i
+```
+
+- Compilation: The compiler translates the preprocessed code (.i) into assembly language, an intermediate representation of the code (.s) code.
+
+> **E.g.**
+```bash
+gcc -S linear-algebra-GJ-filescope.i -o linear-algebra-GJ-filescope.s
+```
+
+- Assembly: The assembler converts the assembly code into machine code (binaries), producing an object file.
+
+> **E.g.**
+```bash
+gcc -c linear-algebra-GJ-filescope.s -o linear-algebra-GJ-filescope.o
+```
+
+
+- Linking: 
+> **E.g.**
+```bash
+gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope
+```

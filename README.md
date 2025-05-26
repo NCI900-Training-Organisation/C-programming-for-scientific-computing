@@ -346,7 +346,7 @@ Before jumping into Makefile syntax, let’s review the C build pipeline. Conver
 gcc -E linear-algebra-GJ-filescope.c -o linear-algebra-GJ-filescope.i
 ```
 
-**Compilation (`.i` → `.s`):**
+2. **Compilation (`.i` → `.s`):**
     The compiler takes the preprocessed code and translates it into assembly language, an intermediate representation of the code. This produces an assembly file (often `.s`).
 
 > **E.g.**
@@ -354,7 +354,7 @@ gcc -E linear-algebra-GJ-filescope.c -o linear-algebra-GJ-filescope.i
 gcc -S linear-algebra-GJ-filescope.i -o linear-algebra-GJ-filescope.s
 ```
 
-**Assembly (`.s` → `.o`):**
+3. **Assembly (`.s` → `.o`):**
     The assembler converts the assembly code into actual machine code (binary). This output is an **object file** (typically `.o`). An object file contains the compiled code for that specific source file but usually cannot be run on its own because it might reference functions or data defined in other files or libraries.
 
 > **E.g.**
@@ -363,10 +363,72 @@ gcc -c linear-algebra-GJ-filescope.s -o linear-algebra-GJ-filescope.o
 ```
 
 
-**Linking (`.o` files + libraries → executable):**
+4. **Linking (`.o` files + libraries → executable):**
     Finally, the linker's role is to take all the object files generated from your project's source code, along with any necessary libraries (like the math library `-lm` or MKL Lapack), and combine them into a single executable file
 
 > **E.g.**
 ```bash
 gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope -lm
+```
+
+
+## Exercises
+
+1. Can you repeat the four steps to generate executable file for **`linear-algebra-GJ.c`** ?
+
+2. Compiling **`linear-algebra-lapack.c`** is likely to be more tricky given the external library linking. Try it yourself.
+
+
+If you agree with my statement in the above exercise, you might need a makefile to help you.
+Another significant advantage is the make system uses the data and time stamp of the file to deterine when files are out of date (changed), so when the progrom is recompiled, it only recompile the changed source codes.
+
+In makefile, we define targets, dependencies and commands to build our project. The basic structure of Makefile includes:
+
+- **file name**: usually is `makefile`.
+
+- **special variables**: Makefile has special variables like `CC` (compiler), `CFLAGS` (compiler flags), and `LDFLAGS` (linker flags) that can be used to customise the build process.
+
+- **targets**: the name/label of the file you want to build. This allows us to build part of the project independently. 
+
+- **automatic variables**: `$@` expands to the current target name, `$^` expands to all prerequesites.
+
+
+> **E.g.**
+```bash
+gcc -Wall -Wextra -g  -L/opt/intel/oneapi/mkl/latest/lib -Wl,-rpath=/opt/intel/oneapi/mkl/latest/lib linear-algebra-lapack-sln.o util.o primitives.o -o solver -lmkl_rt  -lm
+```
+
+can be written into a makefile like:
+
+```makefile
+# Simple Makefile for building the 'solver' executable
+
+# Compiler and flags
+CC       = gcc
+CFLAGS   = -Wall -Wextra -g
+
+# Intel MKL library paths
+MKL_LIB  = -L/opt/intel/oneapi/mkl/latest/lib \
+           -Wl,-rpath=/opt/intel/oneapi/mkl/latest/lib
+
+# Libraries to link
+LDLIBS   = -lmkl_rt -lm
+
+# Object files
+OBJS     = linear-algebra-lapack-sln.o util.o primitives.o
+
+# Default target
+all: solver
+
+# Link the executable
+solver: $(OBJS)
+	$(CC) $(CFLAGS) $(MKL_LIB) $^ -o $@ $(LDLIBS)
+
+# Compile .c files into .o
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean up build artifacts
+clean:
+	rm -f $(OBJS) solver
 ```

@@ -346,14 +346,16 @@ Before jumping into Makefile syntax, let’s review the C build pipeline. Conver
 gcc -E linear-algebra-GJ-filescope.c -o linear-algebra-GJ-filescope.i
 ```
 
-- Compilation: The compiler translates the preprocessed code (.i) into assembly language, an intermediate representation of the code (.s) code.
+**Compilation (`.i` → `.s`):**
+    The compiler takes the preprocessed code and translates it into assembly language, an intermediate representation of the code. This produces an assembly file (often `.s`).
 
 > **E.g.**
 ```bash
 gcc -S linear-algebra-GJ-filescope.i -o linear-algebra-GJ-filescope.s
 ```
 
-- Assembly: The assembler converts the assembly code into machine code (binaries), producing an object file.
+**Assembly (`.s` → `.o`):**
+    The assembler converts the assembly code into actual machine code (binary). This output is an **object file** (typically `.o`). An object file contains the compiled code for that specific source file but usually cannot be run on its own because it might reference functions or data defined in other files or libraries.
 
 > **E.g.**
 ```bash
@@ -361,7 +363,9 @@ gcc -c linear-algebra-GJ-filescope.s -o linear-algebra-GJ-filescope.o
 ```
 
 
-- Linking: 
+**Linking (`.o` files + libraries → executable):**
+    Finally, the linker's role is to take all the object files generated from your project's source code, along with any necessary libraries (like the math library `-lm` or MKL Lapack), and combine them into a single executable file
+
 > **E.g.**
 ```bash
 gcc linear-algebra-GJ-filescope.o -o linear-algebra-GJ-filescope -lm

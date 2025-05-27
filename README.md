@@ -12,7 +12,7 @@ The emphasis of this workshop, however, is less on the intricate mathematical de
 *   Offer users choices of solution methods through configurable options (e.g., command-line flags).
 *   Learn effective error handling strategies to make our C programs more resilient and easier to debug (though segmentation faults remain a C programmer's rite of passage!).
 *   Organise larger projects using multiple source files for better modularity.
-*   Autemate compilation and linking with Makefiles for build.
+*   Automate compilation and linking with Makefiles for build.
 *   Port existing, highly optimised numerical libraries. Specifically, we'll explore how to interface with LAPACK on Gadi, a foundational library that underpins much of the scientific software ecosystem.
 
 We'll kick off with a focused C programming refresher, covering concepts that will be central to our exercises.

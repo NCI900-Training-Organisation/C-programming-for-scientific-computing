@@ -37,10 +37,10 @@ The contents of this workshop are organised as follows:
 
     * - Topic 3 
       - Compilation and Makefile
+..
+  .. toctree::
 
-.. toctree::
-
-    tutorial/c_refresher
-    tutorial/lapack
-    tutorial/compilation
+ ..   tutorial/c_refresher
+ ..   tutorial/lapack
+ ..   tutorial/compilation
 

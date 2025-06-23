@@ -1,15 +1,17 @@
-Introduction to MPI 
-===================================
-.. admonition:: Onboarding NCI ARE 
-   :class: Overview
+C Programming for Scientific Computing
+=================================================
 
-    * **Tutorial:** 20 mins
+This repository contains the materials for the NCI training workshop on C programming for scientific computing.
+.. note::
 
-        **Objectives:**
-            #. Learn how to access and use NCI ARE services
+   This project is under active development.
+
+Contents
+--------
 
 .. toctree::
-   
-   start
-   
 
+   start
+   Prerequisite
+   tutorial
+   

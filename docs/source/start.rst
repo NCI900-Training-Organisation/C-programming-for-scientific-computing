@@ -42,7 +42,7 @@ The contents of this workshop are organised as follows:
 
 .. toctree::
 
-    tutorials/c_refresher
-    tutorials/lapack
-    tutorials/compilation
+    tutorial/c_refresher
+    tutorial/lapack
+    tutorial/compilation
 

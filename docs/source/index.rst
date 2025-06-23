@@ -12,6 +12,6 @@ Contents
 .. toctree::
 
    start
-   Prerequisite
+   prerequisite
    tutorial
    

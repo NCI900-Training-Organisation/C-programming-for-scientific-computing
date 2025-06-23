@@ -1,7 +1,5 @@
-.. _getting-started:
-
-Getting Started
--------
+Outline
+=======
 
 This workshop is part of NCI training provided for NCI users. As such, the contents are tailored to the NCI Gadi supercomputer and high-performance data environments.  
 

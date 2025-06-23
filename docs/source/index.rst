@@ -13,5 +13,7 @@ Contents
 
    start
    prerequisite
-   tutorial
+   tutorial/c_refresher
+   tutorial/lapack
+   tutorial/compilation
    

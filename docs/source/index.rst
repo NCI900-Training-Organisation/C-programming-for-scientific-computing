@@ -18,4 +18,5 @@ Contents
    tutorial/c_refresher
    tutorial/lapack
    tutorial/compilation
+   tutorial/solving-matrix
    

@@ -27,16 +27,16 @@ The contents of this workshop are organised as follows:
     :header-rows: 1
 
     * - Topic 
-      - content
+      - content  
 
     * - Topic 1
-      - C Programming Refresher
+      - C Programming Refresher 
     
     * - Topic 2
-       - LAPACK 
+       - LAPACK  
 
     * - Topic 3 
-      - Compilation and Makefile
+      - Compilation and Makefile 
 ..
   .. toctree::
 

@@ -2,8 +2,8 @@
 
 # -- Project information
 
-project = 'Onboarding NCI ARE'
-copyright = '2024, National Computational Infrastructure'
+project = 'C Programming in Scientific Computing'
+copyright = '2025, National Computational Infrastructure'
 author = 'NCI Training'
 
 release = '0.1'

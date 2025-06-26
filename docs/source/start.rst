@@ -26,21 +26,16 @@ The contents of this workshop are organised as follows:
     :widths: 30 70
     :header-rows: 1
 
-    * - Topic 
-      - content  
-
+    * - Topic
+      - Contents
     * - Topic 1
       - C Programming Refresher 
-    
     * - Topic 2
-       - LAPACK  
-
+      - LAPACK  
     * - Topic 3 
       - Compilation and Makefile 
-..
-  .. toctree::
+    * - Topic 4
+      - Performance Comparison
 
- ..   tutorial/c_refresher
- ..   tutorial/lapack
- ..   tutorial/compilation
+
 
